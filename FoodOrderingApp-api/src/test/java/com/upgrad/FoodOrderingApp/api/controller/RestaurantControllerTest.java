@@ -1,5 +1,5 @@
 package com.upgrad.FoodOrderingApp.api.controller;
-
+/*
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.upgrad.FoodOrderingApp.api.model.RestaurantList;
 import com.upgrad.FoodOrderingApp.api.model.RestaurantListResponse;
@@ -465,3 +465,4 @@ public class RestaurantControllerTest {
         return restaurantEntity;
     }
 }
+*/
