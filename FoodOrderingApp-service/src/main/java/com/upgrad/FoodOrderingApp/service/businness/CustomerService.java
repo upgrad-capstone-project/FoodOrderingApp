@@ -2,13 +2,16 @@ package com.upgrad.FoodOrderingApp.service.businness;
 
 
 import com.upgrad.FoodOrderingApp.service.dao.CustomerDao;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
+import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.regex.Pattern;
 
 @Service
@@ -20,6 +23,7 @@ public class CustomerService {
     @Autowired
     private PasswordCryptographyProvider passwordCryptographyProvider;
 
+    //Creates a new customer after performing checks on the fields
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity createNewCustomer(final CustomerEntity customerEntity) throws SignUpRestrictedException {
 
@@ -48,12 +52,9 @@ public class CustomerService {
         else if (!customerEntity.getContactNum().matches(contactNumRegex)) {
             throw new SignUpRestrictedException("SGR-003", "Invalid contact number!");
         } //If the password provided by the customer is weak
-        else if (customerEntity.getPassword().length()< 8 ||
-                  !customerEntity.getPassword().matches("(?=.*[0-9]).*") ||
-                  !customerEntity.getPassword().matches("?=.*[A-Z].*") ||
-                  !customerEntity.getPassword().matches("?=.*[~!@#$%^&*()_-].*")) {
+        /*else if (customerEntity.getPassword().length()< 8 ||!customerEntity.getPassword().matches("(?=.*[0-9]).*[0-9]") ||!customerEntity.getPassword().matches("=.*[A-Z].*[A-Z]") ||!customerEntity.getPassword().matches("=.*[a-z].*[a-z]") ||!customerEntity.getPassword().matches("=.*[~!@#$%^&*()_-].*")) {
             throw new SignUpRestrictedException("SGR-004","Weak password!");
-        } //Else, save the customer information in the database
+        }*/ //Else, save the customer information in the database
         else {
             String password = customerEntity.getPassword();
             String[] encryptedText = this.passwordCryptographyProvider.encrypt(password);
@@ -62,6 +63,49 @@ public class CustomerService {
             return this.customerDao.createCustomer(customerEntity);
         }
     }
+
+    //Authenticates a customer based on the contact number (as username) and password
+    @Transactional(propagation= Propagation.REQUIRED)
+    public CustomerAuthEntity authenticate (final String contactNum, final String password) throws AuthenticationFailedException{
+       //Contact number should have only numbers from 0 to 9 and must be of 10 digits only
+        String contactNumRegex = "^[0-9]{10}$";
+        if(contactNum.isEmpty() || password.isEmpty() || contactNum.matches(contactNumRegex) || password.length()< 8 || !password.matches("(?=.*[0-9]).*") || !password.matches("(?=.*[A-Z]).*") || !password.matches("(?=.*[~!@#$%^&*()_-]).*")){
+            throw  new AuthenticationFailedException("ATH-003", "Incorrect format of decoded customer name and password");
+        }
+
+        CustomerEntity customerEntity = customerDao.getCustomerByContactNum(contactNum);
+        if(customerEntity == null){
+            throw new AuthenticationFailedException("ATH-001","This contact number has not been registered!");
+        }
+
+        final String encryptedPassword =passwordCryptographyProvider.encrypt(password, customerEntity.getSalt());
+        //If the password is correct, save the customer login information in the database
+        if(encryptedPassword.equals(customerEntity.getPassword())){
+            JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
+            CustomerAuthEntity customerAuthToken = new CustomerAuthEntity();
+            customerAuthToken.setCustomer(customerEntity);
+            final ZonedDateTime now = ZonedDateTime.now();
+            final ZonedDateTime expiresAt = now.plusHours(8);
+            customerAuthToken.setLoginAt(now);
+            customerAuthToken.setExpiresAt(expiresAt);
+            customerAuthToken.setUuid(customerEntity.getUuid());
+            customerDao.createAuthToken(customerAuthToken);
+            customerDao.updateCustomer(customerEntity);
+            return customerAuthToken;
+        } else {
+            throw new AuthenticationFailedException("ATH-002","Invalid Credentials");
+        }
+    }
+
+
+    //This method is the Bearer authorization method
+   /* @Transactional(propagation = Propagation.REQUIRED)
+    public CustomerEntity getCustomer(final String accessToken)throws AuthenticationFailedException{
+        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthToken(accessToken);
+
+    }*/
+
+
 
 
 
