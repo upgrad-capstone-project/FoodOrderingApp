@@ -6,8 +6,10 @@ import com.upgrad.FoodOrderingApp.api.model.SignupCustomerRequest;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
+import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
 import com.upgrad.FoodOrderingApp.api.model.LoginResponse;
+import com.upgrad.FoodOrderingApp.api.model.LogoutResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,7 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
+    //Signup function
     @PostMapping(path = "/customer/signup",consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     //@ApiOperation(value="Registration for new customer")
     @RequestMapping(path = "/customer/signup", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
@@ -54,9 +57,10 @@ public class CustomerController {
 
     }
 
+    //Sign in function
     @RequestMapping(path = "/customer/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LoginResponse> login(@RequestHeader("authentication") final String authentication) throws AuthenticationFailedException {
-        byte[] decode = Base64.getDecoder().decode(authentication.split("Basic")[1]);
+        byte[] decode = Base64.getDecoder().decode(authentication.split("Basic ")[1]);
         String decodedText = new String(decode);
         String[] decodedArray = decodedText.split(":");
         final CustomerAuthEntity customerAuthToken = customerService.authenticate(decodedArray[0], decodedArray[1]);
@@ -78,6 +82,18 @@ public class CustomerController {
         headers.add("access-token", customerAuthToken.getAccessToken());
 
         return new ResponseEntity<LoginResponse>(loginResponse, headers, HttpStatus.OK);
+    }
+
+    //Logout function
+    @RequestMapping(path = "/customer/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<LogoutResponse> logout(@RequestHeader ("authorization") final String accessToken) throws AuthorizationFailedException{
+        String[] bearerToken = accessToken.split("Bearer ");
+        final CustomerAuthEntity customerAuthLogout = customerService.logout(bearerToken[1]);
+
+        LogoutResponse logoutResponse = new LogoutResponse()
+                .id(customerAuthLogout.getUuid())
+                .message("LOGGED OUT SUCCESSFULLY");
+        return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
     }
 
 
