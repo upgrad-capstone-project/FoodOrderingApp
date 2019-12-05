@@ -10,6 +10,9 @@ import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException
 import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
 import com.upgrad.FoodOrderingApp.api.model.LoginResponse;
 import com.upgrad.FoodOrderingApp.api.model.LogoutResponse;
+import com.upgrad.FoodOrderingApp.api.model.UpdateCustomerResponse;
+import com.upgrad.FoodOrderingApp.api.model.UpdateCustomerRequest;
+import com.upgrad.FoodOrderingApp.service.exception.UpdateCustomerException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +97,26 @@ public class CustomerController {
                 .id(customerAuthLogout.getUuid())
                 .message("LOGGED OUT SUCCESSFULLY");
         return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
+    }
+
+    //Customer details update function
+    @RequestMapping(path = "/customer", method = RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<UpdateCustomerResponse> updateCustomer(@RequestBody(required = false) final UpdateCustomerRequest updateCustomerRequest,
+                                                                 @RequestHeader("authorization") final String accessToken) throws UpdateCustomerException, AuthorizationFailedException {
+        String[] bearerToken = accessToken.split("Bearer ");
+        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
+        customerEntity.setFirstName(updateCustomerRequest.getFirstName());
+        customerEntity.setLastName(updateCustomerRequest.getLastName());
+
+        final CustomerEntity updatedCust = customerService.updateCustomer(customerEntity);
+
+        UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse()
+                .firstName(updatedCust.getFirstName())
+                .lastName(updatedCust.getLastName())
+                .id(updatedCust.getUuid())
+                .status("CUSTOMER DETAILS UPDATED SUCCESSFULLY");
+
+        return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, HttpStatus.OK);
     }
 
 

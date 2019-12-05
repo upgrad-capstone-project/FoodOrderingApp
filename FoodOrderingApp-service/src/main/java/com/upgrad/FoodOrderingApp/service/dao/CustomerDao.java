@@ -49,6 +49,4 @@ public class CustomerDao {
         this.entityManager.merge(updatedCustomerEntity);
     }
 
-
-
 }
