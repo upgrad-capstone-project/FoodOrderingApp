@@ -156,4 +156,28 @@ public class CustomerService {
         }
     }
 
+    //This method is used to update customer's password as mentioned in the new password field
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CustomerEntity updateCustomerPassword(final String oldPswrd, final String newPswrd, final CustomerEntity customerEntity) throws UpdateCustomerException{
+        //Check if old password or new password field is empty or not
+        if(oldPswrd.isEmpty() || newPswrd.isEmpty()){
+            throw new UpdateCustomerException("UCR-003","No field should be empty");
+        }
+        else if (newPswrd.length()<8 ||
+                !newPswrd.matches("=.*[0-9].*") ||
+                !newPswrd.matches("=.*[A-Z].*") ||
+                !newPswrd.matches("=.*[a-z].*") ||
+                !newPswrd.matches("=.*[~!@#$%^&*()_-].*")) {
+            throw new UpdateCustomerException("UCR-001", "Weak password!");
+        } else if (!passwordCryptographyProvider.encrypt(oldPswrd,customerEntity.getSalt()).equals(customerEntity.getPassword())) {
+            throw new UpdateCustomerException("UCR-004", "Incorrect old password!");
+        }
+        else {
+            String[] encryptPswrd = this.passwordCryptographyProvider.encrypt(newPswrd);
+            customerEntity.setSalt(encryptPswrd[0]);
+            customerEntity.setPassword(encryptPswrd[1]);
+            return customerEntity;
+        }
+    }
+
 }
