@@ -12,6 +12,8 @@ import com.upgrad.FoodOrderingApp.api.model.LoginResponse;
 import com.upgrad.FoodOrderingApp.api.model.LogoutResponse;
 import com.upgrad.FoodOrderingApp.api.model.UpdateCustomerResponse;
 import com.upgrad.FoodOrderingApp.api.model.UpdateCustomerRequest;
+import com.upgrad.FoodOrderingApp.api.model.UpdatePasswordResponse;
+import com.upgrad.FoodOrderingApp.api.model.UpdatePasswordRequest;
 import com.upgrad.FoodOrderingApp.service.exception.UpdateCustomerException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -117,6 +119,22 @@ public class CustomerController {
                 .status("CUSTOMER DETAILS UPDATED SUCCESSFULLY");
 
         return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse, HttpStatus.OK);
+    }
+
+    //Password update function
+    @RequestMapping(path = "/customer/password", method = RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<UpdatePasswordResponse> updatePassword(@RequestBody(required = false) final UpdatePasswordRequest updatePasswordRequest,
+                                                                 @RequestHeader("authorization") final String accessToken) throws UpdateCustomerException, AuthorizationFailedException{
+        String[] bearerToken = accessToken.split("Bearer ");
+        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
+
+        CustomerEntity updatedCustomer = customerService.updateCustomerPassword(updatePasswordRequest.getOldPassword(), updatePasswordRequest.getNewPassword(), customerEntity);
+
+        UpdatePasswordResponse updatePasswordResponse = new UpdatePasswordResponse()
+                .id(updatedCustomer.getUuid())
+                .status("CUSTOMER PASSWORD UPDATED SUCCESSFULLY");
+
+        return new ResponseEntity<UpdatePasswordResponse>(updatePasswordResponse, HttpStatus.OK);
     }
 
 
