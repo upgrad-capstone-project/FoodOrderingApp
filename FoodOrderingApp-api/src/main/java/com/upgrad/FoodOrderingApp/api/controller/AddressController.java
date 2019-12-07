@@ -5,6 +5,7 @@ import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
 import com.upgrad.FoodOrderingApp.api.model.SaveAddressResponse;
 import com.upgrad.FoodOrderingApp.api.model.SaveAddressRequest;
 import com.upgrad.FoodOrderingApp.api.model.AddressListResponse;
+import com.upgrad.FoodOrderingApp.api.model.DeleteAddressResponse;
 import com.upgrad.FoodOrderingApp.api.model.AddressList;
 import com.upgrad.FoodOrderingApp.api.model.AddressListState;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
@@ -90,4 +91,24 @@ public class AddressController {
         }
         return new ResponseEntity<AddressListResponse>(addressListResponse, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/address/{address_id}", method = RequestMethod.DELETE)
+    public ResponseEntity<DeleteAddressResponse> deleteAddress(@PathVariable("address_id") final String addressUuid,
+                                                               @RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException, AddressNotFoundException{
+        String[] bearerToken = accessToken.split("Bearer ");
+        final CustomerEntity loggedInCustomer = customerService.getCustomer(bearerToken[1]);
+        final AddressEntity addressEntityToBeDeleted = addressService.getAddressByAddressUuid(addressUuid);
+        final CustomerAddressEntity customerAddressEntity = addressService.getCustomerAddressByAddressId(addressEntityToBeDeleted);
+        final CustomerEntity belongsToAddressEntity = customerAddressEntity.getCustomer();
+        final String uuid = addressService.deleteAddress(addressEntityToBeDeleted, loggedInCustomer, belongsToAddressEntity);
+
+        DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse()
+                .id(UUID.fromString(uuid))
+                .status("ADDRESS DELETED SUCCESSFULLY");
+
+        return new ResponseEntity<DeleteAddressResponse>(deleteAddressResponse, HttpStatus.OK);
+
+    }
+
+
 }

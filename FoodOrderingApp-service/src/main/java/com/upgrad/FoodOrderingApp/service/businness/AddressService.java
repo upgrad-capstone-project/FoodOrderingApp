@@ -9,6 +9,7 @@ import com.upgrad.FoodOrderingApp.service.entity.CustomerAddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
+import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SaveAddressException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,37 @@ public class AddressService {
     @Transactional(propagation = Propagation.REQUIRED)
     public List<CustomerAddressEntity> getCustomerAddressesByCustomer (final CustomerEntity customerEntity){
         return customerAddressDao.getCustomerAddressListByCustomer(customerEntity);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public AddressEntity getAddressByAddressUuid(final String addressUuid)throws AddressNotFoundException{
+        //if address id is empty, throw exception
+        if(addressUuid.isEmpty()){
+            throw new AddressNotFoundException("ANF-005", "Address id can not be empty");
+        }
+        AddressEntity addressEntity = addressDao.getAddressByAddressUuid(addressUuid);
+        //if address id is incorrect and no such address exist in database
+        if(addressEntity == null){
+            throw new AddressNotFoundException("ANF-003", "No address by this id");
+        }
+        else {
+            return addressEntity;
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CustomerAddressEntity getCustomerAddressByAddressId(final AddressEntity addressEntity){
+        return customerAddressDao.getCustomerAddressByAddressId(addressEntity);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public String deleteAddress(AddressEntity addressEntity, CustomerEntity signedInCustomer, CustomerEntity belongsToAddressEntity)throws AuthorizationFailedException{
+        if(signedInCustomer.getUuid() != belongsToAddressEntity.getUuid()){
+            throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address ");
+        }
+        else{
+            return addressDao.deleteAddress(addressEntity);
+        }
     }
 
 }
