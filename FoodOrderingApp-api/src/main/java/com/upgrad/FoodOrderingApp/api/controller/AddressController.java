@@ -8,6 +8,8 @@ import com.upgrad.FoodOrderingApp.api.model.AddressListResponse;
 import com.upgrad.FoodOrderingApp.api.model.DeleteAddressResponse;
 import com.upgrad.FoodOrderingApp.api.model.AddressList;
 import com.upgrad.FoodOrderingApp.api.model.AddressListState;
+import com.upgrad.FoodOrderingApp.api.model.StatesListResponse;
+import com.upgrad.FoodOrderingApp.api.model.StatesList;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
@@ -21,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -107,6 +110,24 @@ public class AddressController {
                 .status("ADDRESS DELETED SUCCESSFULLY");
 
         return new ResponseEntity<DeleteAddressResponse>(deleteAddressResponse, HttpStatus.OK);
+
+    }
+
+    @RequestMapping(value = "/states" , method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<StatesListResponse> getAllStates(){
+        List<StateEntity> stateEntityList = new ArrayList<>();
+        stateEntityList.addAll(addressService.getAllStates());
+
+        StatesListResponse statesListResponse = new StatesListResponse();
+
+        for( StateEntity stateEntity : stateEntityList){
+            StatesList statesList = new StatesList();
+            statesList.setId(UUID.fromString(stateEntity.getUuid()));
+            statesList.setStateName(stateEntity.getStateName());
+            statesListResponse.addStatesItem(statesList);
+        }
+
+        return new ResponseEntity<StatesListResponse>(statesListResponse, HttpStatus.OK);
 
     }
 
