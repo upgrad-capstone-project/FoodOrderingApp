@@ -25,4 +25,20 @@ public class AddressDao {
         this.entityManager.persist(customerAddressEntity);
         return customerAddressEntity;
     }
+
+    //Retrieves the address based on a particular addressUuid
+    public AddressEntity getAddressByAddressUuid(final String addressUuid){
+        try{
+            return this.entityManager.createNamedQuery("addressByUuid", AddressEntity.class).setParameter("uuid", addressUuid).getSingleResult();
+        }catch(NoResultException nre){
+            return null;
+        }
+    }
+
+    public String deleteAddress(AddressEntity addressEntity){
+        String uuid = addressEntity.getUuid();
+        this.entityManager.remove(addressEntity);
+        return uuid;
+    }
+
 }
