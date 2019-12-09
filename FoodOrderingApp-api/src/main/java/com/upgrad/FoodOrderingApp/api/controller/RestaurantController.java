@@ -48,14 +48,14 @@ public class RestaurantController {
         for (RestaurantEntity restaurantEntity : restaurantEntityList) {
             RestaurantDetailsResponseAddressState restaurantDetailsResponseAddressState = new RestaurantDetailsResponseAddressState()
                     .id(UUID.fromString(restaurantEntity.getAddress().getState().getUuid()))
-                    .stateName(restaurantEntity.getAddress().getState().getStatename());
+                    .stateName(restaurantEntity.getAddress().getState().getStateName());
 
             RestaurantDetailsResponseAddress restaurantDetailsResponseAddress = new RestaurantDetailsResponseAddress()
                     .id(UUID.fromString(restaurantEntity.getAddress().getUuid()))
-                    .flatBuildingName(restaurantEntity.getAddress().getFlatBuilNo())
+                    .flatBuildingName(restaurantEntity.getAddress().getFlatBuilNumber())
                     .locality(restaurantEntity.getAddress().getLocality())
                     .city(restaurantEntity.getAddress().getCity())
-                    .pincode(restaurantEntity.getAddress().getPincode())
+                    .pincode(restaurantEntity.getAddress().getPinCode())
                     .state(restaurantDetailsResponseAddressState);
 
             String categoriesString = categoryService.getCategoriesByRestaurant(restaurantEntity.getUuid())
@@ -145,7 +145,7 @@ public class RestaurantController {
                     .flatBuildingName(restaurantEntity.getAddress().getFlatBuilNumber())
                     .locality(restaurantEntity.getAddress().getLocality())
                     .city(restaurantEntity.getAddress().getCity())
-                    .pincode(restaurantEntity.getAddress().getPinCode()ode())
+                    .pincode(restaurantEntity.getAddress().getPinCode())
                     .state(restaurantDetailsResponseAddressState);
 
             String categoriesString = categoryService.getCategoriesByRestaurant(restaurantEntity.getUuid())

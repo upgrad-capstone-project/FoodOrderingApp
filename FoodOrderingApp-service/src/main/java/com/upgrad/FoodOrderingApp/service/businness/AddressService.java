@@ -1,6 +1,6 @@
 package com.upgrad.FoodOrderingApp.service.businness;
 
-import com.sun.jndi.cosnaming.IiopUrl;
+// import com.sun.jndi.cosnaming.IiopUrl;
 import com.upgrad.FoodOrderingApp.service.dao.AddressDao;
 import com.upgrad.FoodOrderingApp.service.dao.CustomerAddressDao;
 import com.upgrad.FoodOrderingApp.service.dao.StateDao;

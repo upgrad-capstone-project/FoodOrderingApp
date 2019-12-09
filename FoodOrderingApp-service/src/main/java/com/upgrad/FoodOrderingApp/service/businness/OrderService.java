@@ -80,10 +80,11 @@ public class OrderService {
         return orderItemDao.createOrderItemEntity(orderItemEntity);
     }
 
+
     //getordersby customer
     public List<OrderEntity> getOrdersByCustomers(String customerUUID) {
         //??
-        return
+        return null;
     }
 
 }
