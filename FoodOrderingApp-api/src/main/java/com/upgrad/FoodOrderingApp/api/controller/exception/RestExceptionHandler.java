@@ -1,4 +1,4 @@
-package com.upgrad.FoodOrderingApp.api.exception;
+package com.upgrad.FoodOrderingApp.api.controller.exception;
 
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.http.HttpStatus;
