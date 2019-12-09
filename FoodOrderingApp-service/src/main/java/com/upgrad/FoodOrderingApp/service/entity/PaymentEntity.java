@@ -1,5 +1,6 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
@@ -60,4 +61,5 @@ public class PaymentEntity {
     public void setPaymentName(String paymentName) {
         this.paymentName = paymentName;
     }
+
 }
