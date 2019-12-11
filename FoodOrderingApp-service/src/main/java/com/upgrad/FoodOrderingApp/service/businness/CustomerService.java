@@ -54,9 +54,9 @@ public class CustomerService {
         else if (!customerEntity.getContactNum().matches(contactNumRegex)) {
             throw new SignUpRestrictedException("SGR-003", "Invalid contact number!");
         } //If the password provided by the customer is weak
-        /*else if (customerEntity.getPassword().length()< 8 ||!customerEntity.getPassword().matches("(?=.*[0-9]).*[0-9]") ||!customerEntity.getPassword().matches("=.*[A-Z].*[A-Z]") ||!customerEntity.getPassword().matches("=.*[a-z].*[a-z]") ||!customerEntity.getPassword().matches("=.*[~!@#$%^&*()_-].*")) {
+        else if (weakPassword(customerEntity.getPassword())){
             throw new SignUpRestrictedException("SGR-004","Weak password!");
-        }*/ //Else, save the customer information in the database
+        } //Else, save the customer information in the database
         else {
             String password = customerEntity.getPassword();
             String[] encryptedText = this.passwordCryptographyProvider.encrypt(password);
@@ -64,6 +64,18 @@ public class CustomerService {
             customerEntity.setPassword(encryptedText[1]);
             return this.customerDao.createCustomer(customerEntity);
         }
+    }
+
+    //Method to check password strength
+    public boolean weakPassword (String password) {
+        boolean weak = true;
+        if(password.length()>=8){
+            if(password.matches("(?=.*[0-9]).*[0-9]")){
+            }
+        } else {
+            weak = false;
+        }
+        return weak;
     }
 
     //Authenticates a customer based on the contact number (as username) and password
