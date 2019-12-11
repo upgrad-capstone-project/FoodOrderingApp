@@ -44,7 +44,7 @@ public class CustomerEntity implements Serializable {
     @Column(/*First name cannot be null*/
             name = "FIRSTNAME"
     )
-    @NotNull
+//    @NotNull
     @Size(
             max = 30
     )
@@ -77,7 +77,7 @@ public class CustomerEntity implements Serializable {
     @Column(
             name = "PASSWORD"
     )
-    @NotNull
+//    @NotNull
     private String password;
 
     @Column(
