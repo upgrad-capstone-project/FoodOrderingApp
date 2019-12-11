@@ -38,7 +38,7 @@ public class AddressController {
     private CustomerService customerService;
 
     @RequestMapping(value = "/address", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SaveAddressResponse> saveAddress(@RequestBody(required = false) SaveAddressRequest saveAddressRequest,
+    public ResponseEntity<SaveAddressResponse> saveAddress(SaveAddressRequest saveAddressRequest,
                                                            @RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
         String[] bearerToken = accessToken.split("Bearer ");
         CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);

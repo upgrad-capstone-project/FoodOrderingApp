@@ -37,12 +37,10 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
-    //Signup function
-    @PostMapping(path = "/customer/signup",consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     //@ApiOperation(value="Registration for new customer")
     @RequestMapping(path = "/customer/signup", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE
             , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SignupCustomerResponse> signup(@RequestBody (required = false) final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException{
+    public ResponseEntity<SignupCustomerResponse> signup(final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException{
 
         final CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setUuid(UUID.randomUUID().toString());
