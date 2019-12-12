@@ -78,8 +78,8 @@ public class CustomerController {
         }
         String decodedText = new String(decoded);
         String[] decodedArray = decodedText.split(":");
-        System.out.println(decodedArray[0]);
-        System.out.println(decodedArray[1]);
+//        System.out.println(decodedArray[0]);
+//        System.out.println(decodedArray[1]);
         final CustomerAuthEntity customerAuthToken = customerService.authenticate(decodedArray[0], decodedArray[1]);
 
         CustomerEntity customerEntity = customerAuthToken.getCustomer();

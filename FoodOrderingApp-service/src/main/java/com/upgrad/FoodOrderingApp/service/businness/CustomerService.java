@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Service
@@ -71,13 +72,13 @@ public class CustomerService {
     public boolean weakPassword (String password) {
         boolean weak = true;
         if(password.length()>=8){
-            System.out.println("Length is fine");
+          //  System.out.println("Length is fine");
             if(Pattern.matches(".*[0-9].*",password)){
-                System.out.println("Contains digit");
+            //    System.out.println("Contains digit");
                 if(Pattern.matches(".*[A-Z].*",password)){
-                    System.out.println("Contains capital letter");
+              //      System.out.println("Contains capital letter");
                     if(Pattern.matches(".*[#@$%&*!^].*",password)){
-                        System.out.println("Contains special character");
+                //        System.out.println("Contains special character");
                         weak=false;
                     }
                 }
@@ -109,7 +110,7 @@ public class CustomerService {
             customerAuthToken.setCustomer(customerEntity);
             customerAuthToken.setLoginAt(now);
             customerAuthToken.setExpiresAt(expiresAt);
-            customerAuthToken.setUuid(customerEntity.getUuid());
+            customerAuthToken.setUuid(UUID.randomUUID().toString());
             customerAuthToken.setAccessToken(authToken);
             customerDao.createAuthToken(customerAuthToken);
             customerDao.updateCustomer(customerEntity);

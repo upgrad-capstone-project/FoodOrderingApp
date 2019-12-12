@@ -31,6 +31,7 @@ public class CustomerAuthEntity implements Serializable {
     @Column(/*Must be unique and not null*/
             name = "UUID"
     )
+
     @NotNull
     @Size(
             max = 200
