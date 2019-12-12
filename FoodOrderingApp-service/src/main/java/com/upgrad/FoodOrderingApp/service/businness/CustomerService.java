@@ -70,10 +70,17 @@ public class CustomerService {
     public boolean weakPassword (String password) {
         boolean weak = true;
         if(password.length()>=8){
-            if(password.matches("(?=.*[0-9]).*[0-9]")){
+            System.out.println("Length is fine");
+            if(Pattern.matches(".*[0-9].*",password)){
+                System.out.println("Contains digit");
+                if(Pattern.matches(".*[A-Z].*",password)){
+                    System.out.println("Contains capital letter");
+                    if(Pattern.matches(".*[#@$%&*!^].*",password)){
+                        System.out.println("Contains special character");
+                        weak=false;
+                    }
+                }
             }
-        } else {
-            weak = false;
         }
         return weak;
     }
