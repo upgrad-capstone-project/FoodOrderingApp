@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.ZonedDateTime;
 import java.util.regex.Pattern;
 
@@ -89,11 +90,9 @@ public class CustomerService {
     @Transactional(propagation= Propagation.REQUIRED)
     public CustomerAuthEntity authenticate (final String contactNum, final String password) throws AuthenticationFailedException{
        //Contact number should have only numbers from 0 to 9 and must be of 10 digits only
-        String contactNumRegex = "^[0-9]{10}$";
-        if(contactNum.isEmpty() || password.isEmpty() || contactNum.matches(contactNumRegex) || password.length()< 8 || !password.matches("(?=.*[0-9]).*") || !password.matches("(?=.*[A-Z]).*") || !password.matches("(?=.*[~!@#$%^&*()_-]).*")){
+        if(contactNum.isEmpty() || password.isEmpty()){
             throw  new AuthenticationFailedException("ATH-003", "Incorrect format of decoded customer name and password");
         }
-
         CustomerEntity customerEntity = customerDao.getCustomerByContactNum(contactNum);
         if(customerEntity == null){
             throw new AuthenticationFailedException("ATH-001","This contact number has not been registered!");
@@ -102,14 +101,16 @@ public class CustomerService {
         final String encryptedPassword =passwordCryptographyProvider.encrypt(password, customerEntity.getSalt());
         //If the password is correct, save the customer login information in the database
         if(encryptedPassword.equals(customerEntity.getPassword())){
-            JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
-            CustomerAuthEntity customerAuthToken = new CustomerAuthEntity();
-            customerAuthToken.setCustomer(customerEntity);
+            JwtTokenProvider jwtToken = new JwtTokenProvider(encryptedPassword);
             final ZonedDateTime now = ZonedDateTime.now();
             final ZonedDateTime expiresAt = now.plusHours(8);
+            final String authToken = jwtToken.generateToken(customerEntity.getUuid(), now, expiresAt);
+            CustomerAuthEntity customerAuthToken = new CustomerAuthEntity();
+            customerAuthToken.setCustomer(customerEntity);
             customerAuthToken.setLoginAt(now);
             customerAuthToken.setExpiresAt(expiresAt);
             customerAuthToken.setUuid(customerEntity.getUuid());
+            customerAuthToken.setAccessToken(authToken);
             customerDao.createAuthToken(customerAuthToken);
             customerDao.updateCustomer(customerEntity);
             return customerAuthToken;

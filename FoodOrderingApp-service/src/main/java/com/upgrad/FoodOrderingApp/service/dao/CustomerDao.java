@@ -31,6 +31,7 @@ public class CustomerDao {
 
     //Creates a record in customer_auth table
     public CustomerAuthEntity createAuthToken(CustomerAuthEntity customerAuthEntity){
+
         this.entityManager.persist(customerAuthEntity);
         return customerAuthEntity;
     }
