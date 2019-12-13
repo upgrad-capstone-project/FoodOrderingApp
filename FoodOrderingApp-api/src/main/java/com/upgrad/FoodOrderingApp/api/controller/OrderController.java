@@ -66,14 +66,15 @@ public class OrderController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException
     {
-        String accessToken = authorization.split("Bearer ")[1];
-        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
+//        String accessToken = authorization.split("Bearer ")[1];
+        CustomerEntity customerEntity = customerService.getCustomer(authorization);
 
         // Get all orders by customer
         List<OrderEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity.getUuid());
 
         // Create response
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
+        if(orderEntityList!=null){
 
         for (OrderEntity orderEntity : orderEntityList) {
 
@@ -132,7 +133,7 @@ public class OrderController {
             }
 
             customerOrderResponse.addOrdersItem(orderList);
-        }
+        }}
 
         return new ResponseEntity<CustomerOrderResponse>(customerOrderResponse, HttpStatus.OK);
     }
@@ -140,14 +141,14 @@ public class OrderController {
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, path = "/order", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveOrderResponse> saveOrder(
-            @RequestBody(required = false) final SaveOrderRequest saveOrderRequest,
+            final SaveOrderRequest saveOrderRequest,
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, CouponNotFoundException,
             AddressNotFoundException, PaymentMethodNotFoundException,
             RestaurantNotFoundException, ItemNotFoundException
     {
-        String accessToken = authorization.split("Bearer ")[1];
-        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
+  //      String accessToken = authorization.split("Bearer ")[1];
+        CustomerEntity customerEntity = customerService.getCustomer(authorization);
 
         final OrderEntity orderEntity = new OrderEntity();
         orderEntity.setUuid(UUID.randomUUID().toString());
