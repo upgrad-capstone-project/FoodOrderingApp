@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -169,11 +170,12 @@ public class RestaurantController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET, path = "/restaurant/{restaurant_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(method = RequestMethod.GET, path = "/api/restaurant/{restaurant_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantDetailsResponse> getRestaurantById(
             @PathVariable("restaurant_id") final String restaurantId)
             throws RestaurantNotFoundException
     {
+
         RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantId);
 
         RestaurantDetailsResponseAddressState restaurantDetailsResponseAddressState = new RestaurantDetailsResponseAddressState()
@@ -187,12 +189,12 @@ public class RestaurantController {
                 .city(restaurantEntity.getAddress().getCity())
                 .pincode(restaurantEntity.getAddress().getPinCode())
                 .state(restaurantDetailsResponseAddressState);
-
+Double temp = BigDecimal.valueOf(restaurantEntity.getCustomerRating()).setScale(2, RoundingMode.HALF_UP).doubleValue();
         RestaurantDetailsResponse restaurantDetailsResponse = new RestaurantDetailsResponse()
                 .id(UUID.fromString(restaurantEntity.getUuid()))
                 .restaurantName(restaurantEntity.getRestaurantName())
                 .photoURL(restaurantEntity.getPhotoUrl())
-                .customerRating(new BigDecimal(restaurantEntity.getCustomerRating()))
+                .customerRating(new BigDecimal(temp))
                 .averagePrice(restaurantEntity.getAvgPrice())
                 .numberCustomersRated(restaurantEntity.getNumberCustomersRated())
                 .address(restaurantDetailsResponseAddress);
@@ -221,7 +223,7 @@ public class RestaurantController {
 
 
     @CrossOrigin
-    @RequestMapping(method = RequestMethod.PUT, path = "/restaurant/{restaurant_id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(method = RequestMethod.PUT, path = "/api/restaurant/{restaurant_id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantDetails(
             @RequestParam(name = "customer_rating") final Double customerRating,
             @PathVariable("restaurant_id") final String restaurantId,
@@ -229,12 +231,11 @@ public class RestaurantController {
             throws AuthorizationFailedException, RestaurantNotFoundException, InvalidRatingException
     {
 
-        String accessToken = authorization.split("Bearer ")[1];
-        customerService.getCustomer(accessToken);
+      //  String accessToken = authorization.split("Bearer ")[1];
+        customerService.getCustomer(authorization);
 
         RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantId);
-
-        RestaurantEntity updatedRestaurantEntity = restaurantService.updateRestaurantRating(restaurantEntity, customerRating);
+        restaurantService.updateRestaurantRating(restaurantEntity, customerRating);
 
         RestaurantUpdatedResponse restaurantUpdatedResponse = new RestaurantUpdatedResponse()
                 .id(UUID.fromString(restaurantId))
