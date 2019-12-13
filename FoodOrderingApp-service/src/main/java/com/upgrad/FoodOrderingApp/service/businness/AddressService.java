@@ -48,18 +48,32 @@ public class AddressService {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+
     public StateEntity getStateByUuid(final String stateUuid) throws AddressNotFoundException, SaveAddressException{
-        //if stateUUid is empty
-        if (stateUuid.isEmpty()){
-            throw new SaveAddressException("SAR-001", "No field can be empty.");
-        }//if state is empty
+
         StateEntity stateEntity =stateDao.getStateByUuid(stateUuid);
         if(stateEntity == null){
             throw new AddressNotFoundException("ANF-002","No state by this id");
         }
         else {
             return stateEntity;
+        }
+    }
+
+
+    public String validatePincode(final String pinCode) throws SaveAddressException{
+        boolean validPincode = true;
+        if(pinCode.length()==6){
+            if(pinCode.matches(".*[^0-9].*")) {
+               validPincode = false;
+            }
+        } else {
+            validPincode = false;
+        }
+        if(validPincode) {
+            return pinCode;
+        } else {
+            throw new SaveAddressException("SAR-002","Invalid pincode");
         }
     }
 
@@ -96,19 +110,13 @@ public class AddressService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public String deleteAddress(AddressEntity addressEntity, CustomerEntity signedInCustomer, CustomerEntity belongsToAddressEntity)throws AuthorizationFailedException{
-        if(addressEntity.getActive() == 0){
+
             if(signedInCustomer.getUuid() != belongsToAddressEntity.getUuid()){
                 throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address ");
             }
-            else{
+            else {
                 return addressDao.deleteAddress(addressEntity);
             }
-        }
-        else {
-            addressEntity.setActive(0);
-            return null; //need to check on this
-        }
-
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

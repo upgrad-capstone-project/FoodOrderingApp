@@ -40,15 +40,28 @@ public class AddressController {
     @RequestMapping(value = "/address", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveAddressResponse> saveAddress(SaveAddressRequest saveAddressRequest,
                                                            @RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
-        String[] bearerToken = accessToken.split("Bearer ");
-        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
+     //   String[] bearerToken = accessToken.split("Bearer ");
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
+        try{
+            saveAddressRequest.getFlatBuildingName().isEmpty();
+            saveAddressRequest.getLocality().isEmpty();
+            saveAddressRequest.getCity().isEmpty();
+            saveAddressRequest.getPincode().isEmpty();
+            saveAddressRequest.getStateUuid().isEmpty();
+        } catch(Exception e) {
+            throw new SaveAddressException("SAR-001", "No field can be empty.");
+        }
+
+        String pinCode = addressService.validatePincode(saveAddressRequest.getPincode());
         StateEntity stateEntity = addressService.getStateByUuid(saveAddressRequest.getStateUuid());
 
         final AddressEntity addressEntity = new AddressEntity();
         addressEntity.setUuid(UUID.randomUUID().toString());
         addressEntity.setFlatBuilNumber(saveAddressRequest.getFlatBuildingName());
         addressEntity.setLocality(saveAddressRequest.getLocality());
+        System.out.println(saveAddressRequest.getCity());
         addressEntity.setCity(saveAddressRequest.getCity());
+        addressEntity.setPinCode(pinCode);
         addressEntity.setState(stateEntity);
         addressEntity.setActive(1);
 
@@ -68,8 +81,8 @@ public class AddressController {
 
     @RequestMapping(value = "/address/customer", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AddressListResponse> getSavedAddresses(@RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException {
-        String[] bearerToken = accessToken.split("Bearer ");
-        final CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
+      //  String[] bearerToken = accessToken.split("Bearer ");
+        final CustomerEntity customerEntity = customerService.getCustomer(accessToken);
         final List<CustomerAddressEntity> listCustomerAddressEntity = addressService.getCustomerAddressesByCustomer(customerEntity);
 
         AddressListResponse addressListResponse = new AddressListResponse();
@@ -80,6 +93,7 @@ public class AddressController {
             addressList.setId(UUID.fromString(addressEntity.getUuid()));
             addressList.setFlatBuildingName(addressEntity.getFlatBuilNumber());
             addressList.setLocality(addressEntity.getLocality());
+            addressList.setCity(addressEntity.getCity());
             addressList.setPincode(addressEntity.getPinCode());
 
             StateEntity stateEntity = addressEntity.getState();
@@ -98,11 +112,19 @@ public class AddressController {
     @RequestMapping(value = "/address/{address_id}", method = RequestMethod.DELETE)
     public ResponseEntity<DeleteAddressResponse> deleteAddress(@PathVariable("address_id") final String addressUuid,
                                                                @RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException, AddressNotFoundException{
-        String[] bearerToken = accessToken.split("Bearer ");
-        final CustomerEntity loggedInCustomer = customerService.getCustomer(bearerToken[1]);
+        if(addressUuid.isEmpty()){
+            throw new AddressNotFoundException("ANF-005","Address id can not be empty");
+        }
+      //  String[] bearerToken = accessToken.split("Bearer ");
+        final CustomerEntity loggedInCustomer = customerService.getCustomer(accessToken);
+        System.out.println("loggedinCustomer: "+loggedInCustomer.getFirstName());
         final AddressEntity addressEntityToBeDeleted = addressService.getAddressByAddressUuid(addressUuid);
+        System.out.println("addressentitytobedeleted: "+addressEntityToBeDeleted.getFlatBuilNumber());
+
         final CustomerAddressEntity customerAddressEntity = addressService.getCustomerAddressByAddressId(addressEntityToBeDeleted);
+        System.out.println("customeraddressentity: "+customerAddressEntity.getCustomer().getFirstName());
         final CustomerEntity belongsToAddressEntity = customerAddressEntity.getCustomer();
+        System.out.println("belongstoaddressentity: "+belongsToAddressEntity.getFirstName());
         final String uuid = addressService.deleteAddress(addressEntityToBeDeleted, loggedInCustomer, belongsToAddressEntity);
 
         DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse()
@@ -130,6 +152,4 @@ public class AddressController {
         return new ResponseEntity<StatesListResponse>(statesListResponse, HttpStatus.OK);
 
     }
-
-
 }

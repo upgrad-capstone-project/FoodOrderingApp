@@ -37,8 +37,8 @@ public class AddressDao {
 
     public String deleteAddress(AddressEntity addressEntity){
         String uuid = addressEntity.getUuid();
-        this.entityManager.remove(addressEntity);
+        addressEntity.setActive(0);
+        this.entityManager.merge(addressEntity);
         return uuid;
     }
-
 }
