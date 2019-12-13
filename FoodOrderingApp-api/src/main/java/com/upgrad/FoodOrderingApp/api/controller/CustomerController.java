@@ -135,9 +135,14 @@ public class CustomerController {
     //Customer details update function
     @RequestMapping(path = "/customer", method = RequestMethod.PUT, consumes=MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UpdateCustomerResponse> updateCustomer(final UpdateCustomerRequest updateCustomerRequest,
-                                                                 @RequestHeader("authorization") final String accessToken) throws UpdateCustomerException, AuthorizationFailedException {
+                                                                 @RequestHeader("authorization") final String accessToken) throws UpdateCustomerException, AuthorizationFailedException, AuthenticationFailedException {
         String[] bearerToken = accessToken.split("Bearer ");
-        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
+        CustomerEntity customerEntity=null;
+        if(bearerToken.length==1){
+            throw new AuthenticationFailedException ("ATH-003","Use valid authorization format <Bearer accessToken>");
+        } else {
+            customerEntity = customerService.getCustomer(bearerToken[1]);
+        }
         try {
             updateCustomerRequest.getFirstName().isEmpty();
         } catch (Exception e){

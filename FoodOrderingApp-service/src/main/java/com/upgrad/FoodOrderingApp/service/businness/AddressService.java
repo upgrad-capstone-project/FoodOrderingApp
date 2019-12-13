@@ -110,19 +110,13 @@ public class AddressService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public String deleteAddress(AddressEntity addressEntity, CustomerEntity signedInCustomer, CustomerEntity belongsToAddressEntity)throws AuthorizationFailedException{
-        if(addressEntity.getActive() == 0){
+
             if(signedInCustomer.getUuid() != belongsToAddressEntity.getUuid()){
                 throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address ");
             }
-            else{
+            else {
                 return addressDao.deleteAddress(addressEntity);
             }
-        }
-        else {
-            addressEntity.setActive(0);
-            return null; //need to check on this
-        }
-
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
