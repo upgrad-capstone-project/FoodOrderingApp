@@ -3,10 +3,7 @@ package com.upgrad.FoodOrderingApp.service.businness;
 import com.upgrad.FoodOrderingApp.service.dao.CustomerDao;
 import com.upgrad.FoodOrderingApp.service.dao.OrderDao;
 import com.upgrad.FoodOrderingApp.service.dao.OrderItemDao;
-import com.upgrad.FoodOrderingApp.service.entity.CouponEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
-import com.upgrad.FoodOrderingApp.service.entity.OrderEntity;
-import com.upgrad.FoodOrderingApp.service.entity.OrderItemEntity;
+import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.CouponNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -82,9 +80,12 @@ public class OrderService {
 
 
     //getordersby customer
-    public List<OrderEntity> getOrdersByCustomers(String customerUUID) {
-        //??
-        return null;
-    }
+    public List<OrderEntity> getOrdersByCustomers(CustomerEntity customerEntity) {
+         List<OrderEntity> orderEntityList = new ArrayList<>();
+        for (OrderEntity orderEntity : orderDao.getOrdersByCustomers(customerEntity)) {
 
+            orderEntityList.add(orderEntity);
+        }
+        return orderEntityList;
+    }
 }
