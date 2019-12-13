@@ -112,12 +112,24 @@ public class CustomerController {
     @RequestMapping(path = "/customer/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LogoutResponse> logout(@RequestHeader ("authorization") final String accessToken) throws AuthorizationFailedException{
         String[] bearerToken = accessToken.split("Bearer ");
-        final CustomerAuthEntity customerAuthLogout = customerService.logout(bearerToken[1]);
 
-        LogoutResponse logoutResponse = new LogoutResponse()
-                .id(customerAuthLogout.getUuid())
-                .message("LOGGED OUT SUCCESSFULLY");
-        return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
+       if(bearerToken.length>1){
+            System.out.println("split: "+bearerToken[1]);
+            final CustomerAuthEntity customerAuthLogout = customerService.logout(bearerToken[1]);
+            LogoutResponse logoutResponse = new LogoutResponse()
+                    .id(customerAuthLogout.getUuid())
+                    .message("LOGGED OUT SUCCESSFULLY");
+            return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
+        } else {
+            
+            System.out.println(accessToken);
+            final CustomerAuthEntity customerAuthLogout = customerService.logout(accessToken);
+            LogoutResponse logoutResponse = new LogoutResponse()
+                    .id(customerAuthLogout.getUuid())
+                    .message("LOGGED OUT SUCCESSFULLY");
+            return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
+        }
+
     }
 
     //Customer details update function
