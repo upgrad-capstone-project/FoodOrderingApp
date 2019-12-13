@@ -144,6 +144,7 @@ public class CustomerService {
     //This method is the Bearer authorization method
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity getCustomer(final String accessToken)throws AuthorizationFailedException{
+
         CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthToken(accessToken);
         //if access token doesnt exist in database
         if(customerAuthEntity == null){
@@ -162,41 +163,37 @@ public class CustomerService {
 
     //This method is used to update a customer's Firstname and/or Lastname
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity updateCustomer(final CustomerEntity customerEntity)throws UpdateCustomerException{
+    public CustomerEntity updateCustomer(final CustomerEntity customerEntity,String firstName,String lastName)throws UpdateCustomerException{
         //If the customer's firstname is empty
-        if(customerEntity.getFirstName().isEmpty()){
-            throw new UpdateCustomerException("UCR-002","First name field should not be empty");
-        } else {//else update the customer information
+//else update the customer information
             final CustomerEntity updatedCust = new CustomerEntity();
-            updatedCust.setFirstName(customerEntity.getFirstName());
-            if(!customerEntity.getLastName().isEmpty()){
-                updatedCust.setLastName(customerEntity.getLastName());
-            }
-            updatedCust.setUuid(customerEntity.getUuid());
-            return updatedCust;
-        }
+        customerEntity.setFirstName(firstName);
+        customerEntity.setLastName(lastName);
+        customerDao.updateCustomer(customerEntity);
+        return customerEntity;
     }
 
     //This method is used to update customer's password as mentioned in the new password field
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity updateCustomerPassword(final String oldPswrd, final String newPswrd, final CustomerEntity customerEntity) throws UpdateCustomerException{
         //Check if old password or new password field is empty or not
-        if(oldPswrd.isEmpty() || newPswrd.isEmpty()){
+        try {
+            oldPswrd.isEmpty();
+            newPswrd.isEmpty();
+        } catch (Exception e){
             throw new UpdateCustomerException("UCR-003","No field should be empty");
         }
-        else if (newPswrd.length()<8 ||
-                !newPswrd.matches("=.*[0-9].*") ||
-                !newPswrd.matches("=.*[A-Z].*") ||
-                !newPswrd.matches("=.*[a-z].*") ||
-                !newPswrd.matches("=.*[~!@#$%^&*()_-].*")) {
-            throw new UpdateCustomerException("UCR-001", "Weak password!");
-        } else if (!passwordCryptographyProvider.encrypt(oldPswrd,customerEntity.getSalt()).equals(customerEntity.getPassword())) {
-            throw new UpdateCustomerException("UCR-004", "Incorrect old password!");
+       if (!passwordCryptographyProvider.encrypt(oldPswrd,customerEntity.getSalt()).equals(customerEntity.getPassword())) {
+           throw new UpdateCustomerException("UCR-004", "Incorrect old password!");
+        } else if (weakPassword(newPswrd)) {
+
+           throw new UpdateCustomerException("UCR-001", "Weak password!");
         }
         else {
             String[] encryptPswrd = this.passwordCryptographyProvider.encrypt(newPswrd);
             customerEntity.setSalt(encryptPswrd[0]);
             customerEntity.setPassword(encryptPswrd[1]);
+           customerDao.updateCustomer(customerEntity);
             return customerEntity;
         }
     }
