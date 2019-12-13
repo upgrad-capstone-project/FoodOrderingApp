@@ -144,8 +144,13 @@ public class CustomerService {
     //This method is the Bearer authorization method
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity getCustomer(final String accessToken)throws AuthorizationFailedException{
-
-        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthToken(accessToken);
+        String[] bearerToken = accessToken.split("Bearer ");
+        CustomerAuthEntity customerAuthEntity=null;
+        if(bearerToken.length==1){
+            customerAuthEntity = customerDao.getCustomerAuthToken(accessToken);
+        } else {
+            customerAuthEntity = customerDao.getCustomerAuthToken(bearerToken[1]);
+        }
         //if access token doesnt exist in database
         if(customerAuthEntity == null){
             throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
