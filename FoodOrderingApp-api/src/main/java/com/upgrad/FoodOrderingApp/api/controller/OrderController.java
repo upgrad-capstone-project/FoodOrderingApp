@@ -2,10 +2,7 @@ package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.*;
-import com.upgrad.FoodOrderingApp.service.entity.CouponEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
-import com.upgrad.FoodOrderingApp.service.entity.OrderEntity;
-import com.upgrad.FoodOrderingApp.service.entity.OrderItemEntity;
+import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -70,7 +67,7 @@ public class OrderController {
         CustomerEntity customerEntity = customerService.getCustomer(authorization);
 
         // Get all orders by customer
-        List<OrderEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity.getUuid());
+        List<OrderEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity);
 
         // Create response
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
@@ -98,6 +95,10 @@ public class OrderController {
                     .id(UUID.fromString(orderEntity.getAddress().getState().getUuid()))
                     .stateName(orderEntity.getAddress().getState().getStateName());
 
+            OrderListPayment orderListPayment = new OrderListPayment()
+                    .id(UUID.fromString(orderEntity.getPayment().getUuid()))
+                    .paymentName(orderEntity.getPayment().getPaymentName());
+
             OrderListAddress orderListAddress = new OrderListAddress()
                     .id(UUID.fromString(orderEntity.getAddress().getUuid()))
                     .flatBuildingName(orderEntity.getAddress().getFlatBuilNumber())
@@ -112,7 +113,7 @@ public class OrderController {
                     .coupon(orderListCoupon)
                     .discount(new BigDecimal(orderEntity.getDiscount()))
                     .date(orderEntity.getDate().toString())
-                   // .payment(orderListPayment)
+                    .payment(orderListPayment)
                     .customer(orderListCustomer)
                     .address(orderListAddress);
 
@@ -158,6 +159,21 @@ public class OrderController {
        // orderEntity.setAddress(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId(), customerEntity));
         orderEntity.setBill(saveOrderRequest.getBill().doubleValue());
         orderEntity.setDiscount(saveOrderRequest.getDiscount().doubleValue());
+        orderEntity.setCustomer(customerService.getCustomer(authorization));
+        CustomerEntity loggedInCustomer = customerService.getCustomer(authorization);
+        //System.out.println(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId()).getUuid());
+        AddressEntity tempAddressEntity = addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId());
+        //System.out.println(addressService.getCustomerAddressByAddressId(tempAddressEntity).getId());
+        if(addressService.getCustomerAddressByAddressId(tempAddressEntity)==null){
+            throw new AuthorizationFailedException("ATHR-004","You are not authorized to view/update/delete any one else's address");   
+        }
+         CustomerEntity addressBelongsTo = addressService.getCustomerAddressByAddressId(tempAddressEntity).getCustomer();
+        if(loggedInCustomer.getUuid().equals(addressBelongsTo.getUuid())) {
+            orderEntity.setAddress(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId()));
+        } else {
+            throw new AuthorizationFailedException("ATHR-004","You are not authorized to view/update/delete any one else's address");
+        }
+        orderEntity.setPayment(paymentService.getPaymentMethod(saveOrderRequest.getPaymentId().toString()));
         orderEntity.setRestaurant(restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()));
         orderEntity.setDate(new Date());
         OrderEntity savedOrderEntity = orderService.saveOrder(orderEntity);
@@ -167,6 +183,7 @@ public class OrderController {
             orderItemEntity.setOrder(savedOrderEntity);
             orderItemEntity.setItem(itemService.getItemByUUID(itemQuantity.getItemId().toString()));
             orderItemEntity.setQuantity(itemQuantity.getQuantity());
+            orderItemEntity.setPrice(itemQuantity.getPrice());
             orderItemEntity.setPrice(itemQuantity.getPrice());
             orderService.saveOrderItem(orderItemEntity);
         }
