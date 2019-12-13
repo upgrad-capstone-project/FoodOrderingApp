@@ -42,6 +42,17 @@ public class AddressController {
                                                            @RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
         String[] bearerToken = accessToken.split("Bearer ");
         CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
+        try{
+            saveAddressRequest.getFlatBuildingName().isEmpty();
+            saveAddressRequest.getLocality().isEmpty();
+            saveAddressRequest.getCity().isEmpty();
+            saveAddressRequest.getPincode().isEmpty();
+            saveAddressRequest.getStateUuid().isEmpty();
+        } catch(Exception e) {
+            throw new SaveAddressException("SAR-001", "No field can be empty.");
+        }
+
+        String pinCode = addressService.validatePincode(saveAddressRequest.getPincode());
         StateEntity stateEntity = addressService.getStateByUuid(saveAddressRequest.getStateUuid());
 
         final AddressEntity addressEntity = new AddressEntity();
@@ -49,6 +60,7 @@ public class AddressController {
         addressEntity.setFlatBuilNumber(saveAddressRequest.getFlatBuildingName());
         addressEntity.setLocality(saveAddressRequest.getLocality());
         addressEntity.setCity(saveAddressRequest.getCity());
+        addressEntity.setPinCode(pinCode);
         addressEntity.setState(stateEntity);
         addressEntity.setActive(1);
 

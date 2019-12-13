@@ -48,18 +48,32 @@ public class AddressService {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+
     public StateEntity getStateByUuid(final String stateUuid) throws AddressNotFoundException, SaveAddressException{
-        //if stateUUid is empty
-        if (stateUuid.isEmpty()){
-            throw new SaveAddressException("SAR-001", "No field can be empty.");
-        }//if state is empty
+
         StateEntity stateEntity =stateDao.getStateByUuid(stateUuid);
         if(stateEntity == null){
             throw new AddressNotFoundException("ANF-002","No state by this id");
         }
         else {
             return stateEntity;
+        }
+    }
+
+
+    public String validatePincode(final String pinCode) throws SaveAddressException{
+        boolean validPincode = true;
+        if(pinCode.length()==6){
+            if(pinCode.matches(".*[^0-9].*")) {
+               validPincode = false;
+            }
+        } else {
+            validPincode = false;
+        }
+        if(validPincode) {
+            return pinCode;
+        } else {
+            throw new SaveAddressException("SAR-002","Invalid pincode");
         }
     }
 
