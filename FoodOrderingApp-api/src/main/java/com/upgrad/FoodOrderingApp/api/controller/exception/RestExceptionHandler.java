@@ -74,4 +74,11 @@ public class RestExceptionHandler extends Exception{
         );
     }
 
+    @ExceptionHandler(CouponNotFoundException.class)
+    public ResponseEntity<ErrorResponse> couponNotFoundException(CouponNotFoundException exc, WebRequest request){
+        return new ResponseEntity<ErrorResponse>(
+                new ErrorResponse().code(exc.getCode()).message(exc.getErrorMessage()), HttpStatus.BAD_REQUEST
+        );
+    }
+
 }

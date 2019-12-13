@@ -48,8 +48,8 @@ public class OrderController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, CouponNotFoundException
     {
-        String accessToken = authorization.split("Bearer ")[1];
-        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
+//        String accessToken = authorization.split("Bearer ")[1];
+        CustomerEntity customerEntity = customerService.getCustomer(authorization);
 
         CouponEntity couponEntity = orderService.getCouponByCouponName(couponName);
 
