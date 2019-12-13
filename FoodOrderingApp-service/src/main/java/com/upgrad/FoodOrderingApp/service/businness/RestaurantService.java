@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -86,12 +89,13 @@ public class RestaurantService {
             throw new InvalidRatingException("IRE-001", "Restaurant should be in the range of 1 to 5");
         }
 
-        Double newAverageRating = Math.round(
-                (newRating / (restaurantEntity.getNumberCustomersRated() + 1)
-                        + restaurantEntity.getCustomerRating()) * 100.0) / 100.0;
-        restaurantEntity.setNumberCustomersRated(restaurantEntity.getNumberCustomersRated() + 1);
-        restaurantEntity.setCustomerRating(newAverageRating);
+        Double newAverageRating = (
+      ((restaurantEntity.getNumberCustomersRated()*restaurantEntity.getCustomerRating())+newRating)/
+              (restaurantEntity.getNumberCustomersRated()+1));
 
+        restaurantEntity.setNumberCustomersRated(restaurantEntity.getNumberCustomersRated() + 1);
+       System.out.println(newAverageRating);
+        restaurantEntity.setCustomerRating(newAverageRating);
         return restaurantDao.updateRestaurantEntity(restaurantEntity);
     }
 }
