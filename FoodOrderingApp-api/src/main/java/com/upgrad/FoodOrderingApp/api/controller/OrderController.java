@@ -45,8 +45,13 @@ public class OrderController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, CouponNotFoundException
     {
-//        String accessToken = authorization.split("Bearer ")[1];
-        CustomerEntity customerEntity = customerService.getCustomer(authorization);
+        String[] bearerToken = authorization.split("Bearer ");
+        CustomerEntity customerEntity = null;
+        if(bearerToken.length==1){
+            throw new AuthorizationFailedException("ATHR-005","Use valid authorization format <Bearer accessToken>");
+        } else {
+            customerEntity = customerService.getCustomer(bearerToken[1]);
+        }
 
         CouponEntity couponEntity = orderService.getCouponByCouponName(couponName);
 
@@ -63,8 +68,13 @@ public class OrderController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException
     {
-//        String accessToken = authorization.split("Bearer ")[1];
-        CustomerEntity customerEntity = customerService.getCustomer(authorization);
+        String[] bearerToken = authorization.split("Bearer ");
+        CustomerEntity customerEntity = null;
+        if(bearerToken.length==1){
+            throw new AuthorizationFailedException("ATHR-005","Use valid authorization format <Bearer accessToken>");
+        } else {
+            customerEntity = customerService.getCustomer(bearerToken[1]);
+        }
 
         // Get all orders by customer
         List<OrderEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity);
@@ -148,8 +158,13 @@ public class OrderController {
             AddressNotFoundException, PaymentMethodNotFoundException,
             RestaurantNotFoundException, ItemNotFoundException
     {
-  //      String accessToken = authorization.split("Bearer ")[1];
-        CustomerEntity customerEntity = customerService.getCustomer(authorization);
+        String[] bearerToken = authorization.split("Bearer ");
+        CustomerEntity customerEntity = null;
+        if(bearerToken.length==1){
+            throw new AuthorizationFailedException("ATHR-005","Use valid authorization format <Bearer accessToken>");
+        } else {
+            customerEntity = customerService.getCustomer(bearerToken[1]);
+        }
 
         final OrderEntity orderEntity = new OrderEntity();
         orderEntity.setUuid(UUID.randomUUID().toString());
@@ -159,8 +174,8 @@ public class OrderController {
        // orderEntity.setAddress(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId(), customerEntity));
         orderEntity.setBill(saveOrderRequest.getBill().doubleValue());
         orderEntity.setDiscount(saveOrderRequest.getDiscount().doubleValue());
-        orderEntity.setCustomer(customerService.getCustomer(authorization));
-        CustomerEntity loggedInCustomer = customerService.getCustomer(authorization);
+        orderEntity.setCustomer(customerEntity);
+        CustomerEntity loggedInCustomer = customerEntity;
         //System.out.println(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId()).getUuid());
         AddressEntity tempAddressEntity = addressService.getAddressByUUID(saveOrderRequest.getAddressId(),loggedInCustomer);
         //System.out.println(addressService.getCustomerAddressByAddressId(tempAddressEntity).getId());

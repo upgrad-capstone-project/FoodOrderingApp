@@ -15,6 +15,7 @@ import com.upgrad.FoodOrderingApp.service.entity.CustomerAddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
+import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SaveAddressException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,13 @@ public class AddressController {
     @RequestMapping(value = "/address", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveAddressResponse> saveAddress(SaveAddressRequest saveAddressRequest,
                                                            @RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
-     //   String[] bearerToken = accessToken.split("Bearer ");
-        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
+        String[] bearerToken = accessToken.split("Bearer ");
+        CustomerEntity customerEntity = null;
+        if(bearerToken.length==1){
+            throw new AuthorizationFailedException("ATHR-005","Use valid authorization format <Bearer accessToken>");
+        } else {
+            customerEntity = customerService.getCustomer(bearerToken[1]);
+        }
         try{
             saveAddressRequest.getFlatBuildingName().isEmpty();
             saveAddressRequest.getLocality().isEmpty();
@@ -77,8 +83,13 @@ public class AddressController {
 
     @RequestMapping(value = "/address/customer", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AddressListResponse> getSavedAddresses(@RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException {
-      //  String[] bearerToken = accessToken.split("Bearer ");
-        final CustomerEntity customerEntity = customerService.getCustomer(accessToken);
+        String[] bearerToken = accessToken.split("Bearer ");
+        CustomerEntity customerEntity = null;
+        if(bearerToken.length==1){
+            throw new AuthorizationFailedException("ATHR-005","Use valid authorization format <Bearer accessToken>");
+        } else {
+            customerEntity = customerService.getCustomer(bearerToken[1]);
+        }
         final List<AddressEntity> addressEntityList = addressService.getAllAddress(customerEntity);
 
         AddressListResponse addressListResponse = new AddressListResponse();
@@ -110,8 +121,14 @@ public class AddressController {
         if(addressUuid.isEmpty()){
             throw new AddressNotFoundException("ANF-005","Address id can not be empty");
         }
-      //  String[] bearerToken = accessToken.split("Bearer ");
-        final CustomerEntity loggedInCustomer = customerService.getCustomer(accessToken);
+        String[] bearerToken = accessToken.split("Bearer ");
+        CustomerEntity loggedInCustomer = null;
+        if(bearerToken.length==1){
+            throw new AuthorizationFailedException("ATHR-005","Use valid authorization format <Bearer accessToken>");
+        } else {
+            loggedInCustomer = customerService.getCustomer(bearerToken[1]);
+        }
+
         System.out.println("loggedinCustomer: "+loggedInCustomer.getFirstName());
         final AddressEntity addressEntityToBeDeleted = addressService.getAddressByUUID(addressUuid,loggedInCustomer);
         final String uuid = addressService.deleteAddress(addressEntityToBeDeleted).getUuid();
