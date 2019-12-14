@@ -231,8 +231,13 @@ Double temp = BigDecimal.valueOf(restaurantEntity.getCustomerRating()).setScale(
             throws AuthorizationFailedException, RestaurantNotFoundException, InvalidRatingException
     {
 
-      //  String accessToken = authorization.split("Bearer ")[1];
-        customerService.getCustomer(authorization);
+        String[] bearerToken = authorization.split("Bearer ");
+        CustomerEntity customerEntity = null;
+        if(bearerToken.length==1){
+            throw new AuthorizationFailedException("ATH-003","Use valid authorization format <Bearer accessToken>");
+        } else {
+            customerEntity = customerService.getCustomer(bearerToken[1]);
+        }
 
         RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantId);
         restaurantService.updateRestaurantRating(restaurantEntity, customerRating);

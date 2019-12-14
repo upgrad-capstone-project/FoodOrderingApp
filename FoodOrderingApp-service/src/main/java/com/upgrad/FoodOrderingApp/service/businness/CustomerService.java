@@ -144,12 +144,12 @@ public class CustomerService {
     //This method is the Bearer authorization method
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity getCustomer(final String accessToken)throws AuthorizationFailedException{
-        String[] bearerToken = accessToken.split("Bearer ");
+
         CustomerAuthEntity customerAuthEntity=null;
-        if(bearerToken.length==1){
+        if(accessToken!=null){
             customerAuthEntity = customerDao.getCustomerAuthToken(accessToken);
         } else {
-            customerAuthEntity = customerDao.getCustomerAuthToken(bearerToken[1]);
+            throw new AuthorizationFailedException("ATHR-004","Access token cannot be null");
         }
         //if access token doesnt exist in database
         if(customerAuthEntity == null){

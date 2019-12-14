@@ -113,23 +113,15 @@ public class CustomerController {
     public ResponseEntity<LogoutResponse> logout(@RequestHeader ("authorization") final String accessToken) throws AuthorizationFailedException{
         String[] bearerToken = accessToken.split("Bearer ");
 
-       if(bearerToken.length>1){
-         //   System.out.println("split: "+bearerToken[1]);
+        if(bearerToken.length==1){
+            throw new AuthorizationFailedException("ATH-003","Use valid authorization format <Bearer accessToken>");
+        } else {
             final CustomerAuthEntity customerAuthLogout = customerService.logout(bearerToken[1]);
             LogoutResponse logoutResponse = new LogoutResponse()
                     .id(customerAuthLogout.getUuid())
                     .message("LOGGED OUT SUCCESSFULLY");
             return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
-        } else {
-
-           System.out.println(accessToken);
-           final CustomerAuthEntity customerAuthLogout = customerService.logout(accessToken);
-           LogoutResponse logoutResponse = new LogoutResponse()
-                   .id(customerAuthLogout.getUuid())
-                   .message("LOGGED OUT SUCCESSFULLY");
-           return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
-       }
-
+        }
     }
 
     //Customer details update function
@@ -165,7 +157,12 @@ public class CustomerController {
     public ResponseEntity<UpdatePasswordResponse> updatePassword(final UpdatePasswordRequest updatePasswordRequest,
                                                                  @RequestHeader("authorization") final String accessToken) throws UpdateCustomerException, AuthorizationFailedException{
         String[] bearerToken = accessToken.split("Bearer ");
-        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
+        CustomerEntity customerEntity = null;
+        if(bearerToken.length==1){
+            throw new AuthorizationFailedException("ATH-003","Use valid authorization format <Bearer accessToken>");
+        } else {
+            customerEntity = customerService.getCustomer(bearerToken[1]);
+        }
 
         CustomerEntity updatedCustomer = customerService.updateCustomerPassword(updatePasswordRequest.getOldPassword(), updatePasswordRequest.getNewPassword(), customerEntity);
 
