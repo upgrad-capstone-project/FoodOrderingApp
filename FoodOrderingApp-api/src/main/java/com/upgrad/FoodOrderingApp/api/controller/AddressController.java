@@ -24,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,24 +54,19 @@ public class AddressController {
         }
 
         String pinCode = addressService.validatePincode(saveAddressRequest.getPincode());
-        StateEntity stateEntity = addressService.getStateByUuid(saveAddressRequest.getStateUuid());
+        StateEntity stateEntity = addressService.getStateByUUID(saveAddressRequest.getStateUuid());
 
         final AddressEntity addressEntity = new AddressEntity();
         addressEntity.setUuid(UUID.randomUUID().toString());
-        addressEntity.setFlatBuilNumber(saveAddressRequest.getFlatBuildingName());
+        addressEntity.setFlatBuilNo(saveAddressRequest.getFlatBuildingName());
         addressEntity.setLocality(saveAddressRequest.getLocality());
         System.out.println(saveAddressRequest.getCity());
         addressEntity.setCity(saveAddressRequest.getCity());
-        addressEntity.setPinCode(pinCode);
+        addressEntity.setPincode(pinCode);
         addressEntity.setState(stateEntity);
         addressEntity.setActive(1);
 
-        final AddressEntity persistedAddressEntity = addressService.saveAddress(addressEntity);
-
-        final CustomerAddressEntity customerAddressEntity = new CustomerAddressEntity();
-        customerAddressEntity.setAddress(persistedAddressEntity);
-        customerAddressEntity.setCustomer(customerEntity);
-        addressService.createCustomerAddress(customerAddressEntity);
+        final AddressEntity persistedAddressEntity = addressService.saveAddress(addressEntity,customerEntity);
 
         SaveAddressResponse saveAddressResponse = new SaveAddressResponse()
                 .id(persistedAddressEntity.getUuid()).status("ADDRESS SUCCESSFULLY REGISTERED");
@@ -83,20 +79,19 @@ public class AddressController {
     public ResponseEntity<AddressListResponse> getSavedAddresses(@RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException {
       //  String[] bearerToken = accessToken.split("Bearer ");
         final CustomerEntity customerEntity = customerService.getCustomer(accessToken);
-        final List<CustomerAddressEntity> listCustomerAddressEntity = addressService.getCustomerAddressesByCustomer(customerEntity);
+        final List<AddressEntity> addressEntityList = addressService.getAllAddress(customerEntity);
 
         AddressListResponse addressListResponse = new AddressListResponse();
-
-        for(CustomerAddressEntity customerAddressEntity : listCustomerAddressEntity ){
-            AddressEntity addressEntity = customerAddressEntity.getAddress();
+        Collections.reverse(addressEntityList);
+        for(AddressEntity customerAddresses : addressEntityList ){
             AddressList addressList = new AddressList();
-            addressList.setId(UUID.fromString(addressEntity.getUuid()));
-            addressList.setFlatBuildingName(addressEntity.getFlatBuilNumber());
-            addressList.setLocality(addressEntity.getLocality());
-            addressList.setCity(addressEntity.getCity());
-            addressList.setPincode(addressEntity.getPinCode());
+            addressList.setId(UUID.fromString(customerAddresses.getUuid()));
+            addressList.setFlatBuildingName(customerAddresses.getFlatBuilNumber());
+            addressList.setLocality(customerAddresses.getLocality());
+            addressList.setCity(customerAddresses.getCity());
+            addressList.setPincode(customerAddresses.getPinCode());
 
-            StateEntity stateEntity = addressEntity.getState();
+            StateEntity stateEntity = customerAddresses.getState();
             AddressListState addressListState = new AddressListState();
             addressListState.setId(UUID.fromString(stateEntity.getUuid()));
             addressListState.setStateName(stateEntity.getStateName());
@@ -118,14 +113,8 @@ public class AddressController {
       //  String[] bearerToken = accessToken.split("Bearer ");
         final CustomerEntity loggedInCustomer = customerService.getCustomer(accessToken);
         System.out.println("loggedinCustomer: "+loggedInCustomer.getFirstName());
-        final AddressEntity addressEntityToBeDeleted = addressService.getAddressByAddressUuid(addressUuid);
-        System.out.println("addressentitytobedeleted: "+addressEntityToBeDeleted.getFlatBuilNumber());
-
-        final CustomerAddressEntity customerAddressEntity = addressService.getCustomerAddressByAddressId(addressEntityToBeDeleted);
-        System.out.println("customeraddressentity: "+customerAddressEntity.getCustomer().getFirstName());
-        final CustomerEntity belongsToAddressEntity = customerAddressEntity.getCustomer();
-        System.out.println("belongstoaddressentity: "+belongsToAddressEntity.getFirstName());
-        final String uuid = addressService.deleteAddress(addressEntityToBeDeleted, loggedInCustomer, belongsToAddressEntity);
+        final AddressEntity addressEntityToBeDeleted = addressService.getAddressByUUID(addressUuid,loggedInCustomer);
+        final String uuid = addressService.deleteAddress(addressEntityToBeDeleted).getUuid();
 
         DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse()
                 .id(UUID.fromString(uuid))

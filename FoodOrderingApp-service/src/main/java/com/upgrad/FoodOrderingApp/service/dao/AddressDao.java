@@ -35,10 +35,10 @@ public class AddressDao {
         }
     }
 
-    public String deleteAddress(AddressEntity addressEntity){
+    public AddressEntity deleteAddress(AddressEntity addressEntity){
         String uuid = addressEntity.getUuid();
         addressEntity.setActive(0);
         this.entityManager.merge(addressEntity);
-        return uuid;
+        return addressEntity;
     }
 }

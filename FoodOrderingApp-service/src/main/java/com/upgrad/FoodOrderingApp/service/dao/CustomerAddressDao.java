@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -26,9 +27,14 @@ public class CustomerAddressDao {
     }
 
     //Retrieve the list of addresses of a particular customer
-    public List<CustomerAddressEntity> getCustomerAddressListByCustomer(CustomerEntity customerEntity){
+    public List<AddressEntity> getCustomerAddressListByCustomer(CustomerEntity customerEntity){
         try{
-            return this.entityManager.createNamedQuery("customerAddressesByCustomerId", CustomerAddressEntity.class).setParameter("customer", customerEntity).getResultList();
+            List<AddressEntity> addressEntityList = new ArrayList<>();
+            List<CustomerAddressEntity> customerAddressEntityList = this.entityManager.createNamedQuery("customerAddressesByCustomerId", CustomerAddressEntity.class).setParameter("customer", customerEntity).getResultList();
+            for(CustomerAddressEntity customerAddressEntity:customerAddressEntityList){
+                addressEntityList.add(customerAddressEntity.getAddress());
+            }
+            return addressEntityList;
         }catch (NoResultException nre){
             return null;
         }

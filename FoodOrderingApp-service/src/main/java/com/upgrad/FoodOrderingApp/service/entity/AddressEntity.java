@@ -95,7 +95,7 @@ public class AddressEntity implements Serializable {
         return flatBuilNumber;
     }
 
-    public void setFlatBuilNumber(String flatBuilNumber) {
+    public void setFlatBuilNo(String flatBuilNumber) {
         this.flatBuilNumber = flatBuilNumber;
     }
 
@@ -119,7 +119,7 @@ public class AddressEntity implements Serializable {
         return pinCode;
     }
 
-    public void setPinCode(String pinCode) {
+    public void setPincode(String pinCode) {
         this.pinCode = pinCode;
     }
 

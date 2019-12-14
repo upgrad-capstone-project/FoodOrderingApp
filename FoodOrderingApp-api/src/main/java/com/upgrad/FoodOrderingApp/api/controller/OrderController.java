@@ -162,17 +162,12 @@ public class OrderController {
         orderEntity.setCustomer(customerService.getCustomer(authorization));
         CustomerEntity loggedInCustomer = customerService.getCustomer(authorization);
         //System.out.println(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId()).getUuid());
-        AddressEntity tempAddressEntity = addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId());
+        AddressEntity tempAddressEntity = addressService.getAddressByUUID(saveOrderRequest.getAddressId(),loggedInCustomer);
         //System.out.println(addressService.getCustomerAddressByAddressId(tempAddressEntity).getId());
         if(addressService.getCustomerAddressByAddressId(tempAddressEntity)==null){
-            throw new AuthorizationFailedException("ATHR-004","You are not authorized to view/update/delete any one else's address");   
-        }
-         CustomerEntity addressBelongsTo = addressService.getCustomerAddressByAddressId(tempAddressEntity).getCustomer();
-        if(loggedInCustomer.getUuid().equals(addressBelongsTo.getUuid())) {
-            orderEntity.setAddress(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId()));
-        } else {
             throw new AuthorizationFailedException("ATHR-004","You are not authorized to view/update/delete any one else's address");
         }
+        orderEntity.setAddress(addressService.getAddressByUUID(saveOrderRequest.getAddressId(),loggedInCustomer));
         orderEntity.setPayment(paymentService.getPaymentMethod(saveOrderRequest.getPaymentId().toString()));
         orderEntity.setRestaurant(restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()));
         orderEntity.setDate(new Date());
