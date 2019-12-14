@@ -234,7 +234,7 @@ Double temp = BigDecimal.valueOf(restaurantEntity.getCustomerRating()).setScale(
         String[] bearerToken = authorization.split("Bearer ");
         CustomerEntity customerEntity = null;
         if(bearerToken.length==1){
-            throw new AuthorizationFailedException("ATH-003","Use valid authorization format <Bearer accessToken>");
+            throw new AuthorizationFailedException("ATHR-005","Use valid authorization format <Bearer accessToken>");
         } else {
             customerEntity = customerService.getCustomer(bearerToken[1]);
         }
