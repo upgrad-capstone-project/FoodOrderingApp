@@ -174,8 +174,8 @@ public class OrderController {
        // orderEntity.setAddress(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId(), customerEntity));
         orderEntity.setBill(saveOrderRequest.getBill().doubleValue());
         orderEntity.setDiscount(saveOrderRequest.getDiscount().doubleValue());
-        orderEntity.setCustomer(customerService.getCustomer(authorization));
-        CustomerEntity loggedInCustomer = customerService.getCustomer(authorization);
+        orderEntity.setCustomer(customerEntity);
+        CustomerEntity loggedInCustomer = customerEntity;
         //System.out.println(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId()).getUuid());
         AddressEntity tempAddressEntity = addressService.getAddressByUUID(saveOrderRequest.getAddressId(),loggedInCustomer);
         //System.out.println(addressService.getCustomerAddressByAddressId(tempAddressEntity).getId());

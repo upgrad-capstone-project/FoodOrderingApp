@@ -151,7 +151,7 @@ public class CustomerService {
         } else {
             throw new AuthorizationFailedException("ATHR-004","Access token cannot be null");
         }
-        //if access token doesnt exist in database
+        //if access token doesnt exist in databases
         if(customerAuthEntity == null){
             throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
         }//If access token exiats in database but the customer has already logged out
