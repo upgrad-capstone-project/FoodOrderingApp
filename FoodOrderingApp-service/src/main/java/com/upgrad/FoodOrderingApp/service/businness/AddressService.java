@@ -30,7 +30,7 @@ public class AddressService {
     private StateDao stateDao;
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public AddressEntity saveAddress(final AddressEntity addressEntity )throws SaveAddressException{
+    public AddressEntity saveAddress(final AddressEntity addressEntity,final CustomerEntity customerEntity)throws SaveAddressException{
         //pincode must have digits only from 0 to 9 and must be of 6 digits
         String pinCodeRegex ="^[0-9]{6}$";
         if(addressEntity.getFlatBuilNumber().isEmpty()
@@ -44,12 +44,17 @@ public class AddressService {
             throw new SaveAddressException("SAR-002", "Invalid pincode");
         }//else create the address iin the database
         else {
-            return addressDao.createAddress(addressEntity);
+            AddressEntity persistedAddressEntity = addressDao.createAddress(addressEntity);
+            final CustomerAddressEntity customerAddressEntity = new CustomerAddressEntity();
+            customerAddressEntity.setAddress(persistedAddressEntity);
+            customerAddressEntity.setCustomer(customerEntity);
+            createCustomerAddress(customerAddressEntity);
+            return persistedAddressEntity;
         }
     }
 
-
-    public StateEntity getStateByUuid(final String stateUuid) throws AddressNotFoundException, SaveAddressException{
+//Get state details by UUID
+    public StateEntity getStateByUUID(final String stateUuid) throws AddressNotFoundException, SaveAddressException{
 
         StateEntity stateEntity =stateDao.getStateByUuid(stateUuid);
         if(stateEntity == null){
@@ -83,23 +88,30 @@ public class AddressService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<CustomerAddressEntity> getCustomerAddressesByCustomer (final CustomerEntity customerEntity){
+    public List<AddressEntity> getAllAddress (final CustomerEntity customerEntity){
         return customerAddressDao.getCustomerAddressListByCustomer(customerEntity);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public AddressEntity getAddressByAddressUuid(final String addressUuid)throws AddressNotFoundException{
+    public AddressEntity getAddressByUUID(final String addressUuid,final CustomerEntity customerEntity) throws AddressNotFoundException, AuthorizationFailedException {
         //if address id is empty, throw exception
         if(addressUuid.isEmpty()){
             throw new AddressNotFoundException("ANF-005", "Address id can not be empty");
         }
-        AddressEntity addressEntity = addressDao.getAddressByAddressUuid(addressUuid);
+        AddressEntity addressEntityToBeDeleted = addressDao.getAddressByAddressUuid(addressUuid);
         //if address id is incorrect and no such address exist in database
-        if(addressEntity == null){
+        if(addressEntityToBeDeleted == null){
             throw new AddressNotFoundException("ANF-003", "No address by this id");
         }
         else {
-            return addressEntity;
+            final CustomerAddressEntity customerAddressEntity = getCustomerAddressByAddressId(addressEntityToBeDeleted);
+            final CustomerEntity belongsToAddressEntity = customerAddressEntity.getCustomer();
+            if(belongsToAddressEntity.getUuid() != customerEntity.getUuid()){
+                throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address ");
+            }
+            else {
+                return addressEntityToBeDeleted;
+            }
         }
     }
 
@@ -109,15 +121,10 @@ public class AddressService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public String deleteAddress(AddressEntity addressEntity, CustomerEntity signedInCustomer, CustomerEntity belongsToAddressEntity)throws AuthorizationFailedException{
-
-            if(signedInCustomer.getUuid() != belongsToAddressEntity.getUuid()){
-                throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address ");
-            }
-            else {
+    public AddressEntity deleteAddress(AddressEntity addressEntity){
                 return addressDao.deleteAddress(addressEntity);
             }
-    }
+
 
     @Transactional(propagation = Propagation.REQUIRED)
     public List<StateEntity> getAllStates(){
