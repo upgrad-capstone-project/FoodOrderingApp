@@ -58,7 +58,7 @@ public class CustomerController {
         customerEntity.setSalt("1234abc");
         customerEntity.setPassword(signupCustomerRequest.getPassword());
 
-        final CustomerEntity newCustomerEntity = customerService.createNewCustomer(customerEntity);
+        final CustomerEntity newCustomerEntity = customerService.saveCustomer(customerEntity);
 
         SignupCustomerResponse customerResponse = new SignupCustomerResponse()
                 .id(newCustomerEntity.getUuid())
@@ -147,9 +147,10 @@ public class CustomerController {
             updateCustomerRequest.getFirstName().isEmpty();
         } catch (Exception e){
         throw new UpdateCustomerException("UCR-002","First name field should not be empty");
-
         }
-        final CustomerEntity updatedCust = customerService.updateCustomer(customerEntity,updateCustomerRequest.getFirstName(),updateCustomerRequest.getLastName());
+        customerEntity.setFirstName(updateCustomerRequest.getFirstName());
+        customerEntity.setFirstName(updateCustomerRequest.getLastName());
+        final CustomerEntity updatedCust = customerService.updateCustomer(customerEntity);
         UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse()
                 .firstName(updatedCust.getFirstName())
                 .lastName(updatedCust.getLastName())

@@ -29,7 +29,7 @@ public class CustomerService {
 
     //Creates a new customer after performing checks on the fields
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity createNewCustomer(final CustomerEntity customerEntity) throws SignUpRestrictedException {
+    public CustomerEntity saveCustomer(final CustomerEntity customerEntity) throws SignUpRestrictedException {
 
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
                             "[a-zA-Z0-9_+&*-]+)*@"+
@@ -168,12 +168,10 @@ public class CustomerService {
 
     //This method is used to update a customer's Firstname and/or Lastname
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity updateCustomer(final CustomerEntity customerEntity,String firstName,String lastName)throws UpdateCustomerException{
+    public CustomerEntity updateCustomer(final CustomerEntity customerEntity)throws UpdateCustomerException{
         //If the customer's firstname is empty
 //else update the customer information
-            final CustomerEntity updatedCust = new CustomerEntity();
-        customerEntity.setFirstName(firstName);
-        customerEntity.setLastName(lastName);
+
         customerDao.updateCustomer(customerEntity);
         return customerEntity;
     }
