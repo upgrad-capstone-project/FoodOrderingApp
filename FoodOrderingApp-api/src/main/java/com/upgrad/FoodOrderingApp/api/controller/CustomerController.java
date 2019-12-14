@@ -141,7 +141,7 @@ public class CustomerController {
         throw new UpdateCustomerException("UCR-002","First name field should not be empty");
         }
         customerEntity.setFirstName(updateCustomerRequest.getFirstName());
-        customerEntity.setFirstName(updateCustomerRequest.getLastName());
+        customerEntity.setLastName(updateCustomerRequest.getLastName());
         final CustomerEntity updatedCust = customerService.updateCustomer(customerEntity);
         UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse()
                 .firstName(updatedCust.getFirstName())
