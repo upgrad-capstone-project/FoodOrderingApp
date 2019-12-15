@@ -87,11 +87,18 @@ public class OrderController {
         if(orderEntityList!=null){
 
         for (OrderEntity orderEntity : orderEntityList) {
-
-            OrderListCoupon orderListCoupon = new OrderListCoupon()
-                    .id(UUID.fromString(orderEntity.getCoupon().getUuid()))
-                    .couponName(orderEntity.getCoupon().getCouponName())
-                    .percent(orderEntity.getCoupon().getPercent());
+            OrderListCoupon orderListCoupon = null;
+            if(orderEntity.getCoupon()==null) {
+                orderListCoupon = new OrderListCoupon()
+                        .id(null)
+                        .couponName(null)
+                        .percent(null);
+            } else {
+                orderListCoupon = new OrderListCoupon()
+                        .id(UUID.fromString(orderEntity.getCoupon().getUuid()))
+                        .couponName(orderEntity.getCoupon().getCouponName())
+                        .percent(orderEntity.getCoupon().getPercent());
+            }
             //payment
 //            OrderListPayment orderListPayment = new OrderListPayment()
 //                    .id(UUID.fromString(orderEntity.getPayment().getUuid()))
@@ -172,7 +179,9 @@ public class OrderController {
 
         final OrderEntity orderEntity = new OrderEntity();
         orderEntity.setUuid(UUID.randomUUID().toString());
-        orderEntity.setCoupon(orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString()));
+        if(saveOrderRequest.getCouponId()!=null) {
+            orderEntity.setCoupon(orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString()));
+        }
        // orderEntity.setPayment(paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()));
        // orderEntity.setCustomer(customerEntity);
        // orderEntity.setAddress(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId(), customerEntity));

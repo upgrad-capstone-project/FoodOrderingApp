@@ -32,7 +32,7 @@ public class OrderEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "coupon_id")
-    @NotNull
+   // @NotNull
     private CouponEntity coupon;
 
     @Column(name = "discount")
@@ -65,7 +65,7 @@ public class OrderEntity implements Serializable {
 
     public OrderEntity() {}
 
-    public OrderEntity(@NotNull @Size(max = 200) String uuid, @NotNull Double bill, @NotNull CouponEntity coupon, @NotNull Double discount, @NotNull Date date, @NotNull PaymentEntity payment, @NotNull CustomerEntity customer, @NotNull AddressEntity address, RestaurantEntity restaurant) {
+    public OrderEntity(@NotNull @Size(max = 200) String uuid, @NotNull Double bill, CouponEntity coupon, @NotNull Double discount, @NotNull Date date, @NotNull PaymentEntity payment, @NotNull CustomerEntity customer, @NotNull AddressEntity address, RestaurantEntity restaurant) {
         this.uuid = uuid;
         this.bill = new BigDecimal(bill);
         this.coupon = coupon;
