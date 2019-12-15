@@ -28,6 +28,8 @@ public class ItemController {
     private RestaurantService restaurantService;
 
 
+    //Lists top 5 items from a restaurant - Top 5 decided based on number of orders
+    //Lists top 5 items by restaurant id
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/item/restaurant/{restaurant_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     private ResponseEntity<ItemListResponse> getItemsByPopularity(

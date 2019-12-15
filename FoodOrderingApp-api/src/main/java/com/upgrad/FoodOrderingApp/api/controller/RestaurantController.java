@@ -38,6 +38,8 @@ public class RestaurantController {
     @Autowired
     private CustomerService customerService;
 
+    //List all restaurants available in DB table
+    //No API input
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/restaurant", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantListResponse> getAllRestaurants() {
@@ -79,6 +81,8 @@ public class RestaurantController {
         return new ResponseEntity<RestaurantListResponse>(restaurantListResponse, HttpStatus.OK);
     }
 
+    //Lists all restaurant details based on restaurant name search
+    //Lists partial matches as well
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/restaurant/name/{restaurant_name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantListResponse> getRestaurantsByName(
@@ -127,6 +131,7 @@ public class RestaurantController {
     }
 
 
+    //List all restaurants that is mapped to a particular category
     @RequestMapping(method = RequestMethod.GET, path = "/restaurant/category/{category_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantListResponse> getRestaurantsByCategoryId(
             @PathVariable("category_id") final String categoryId)
@@ -170,6 +175,7 @@ public class RestaurantController {
     }
 
 
+    //Get restaurant details by restaurant ID
     @RequestMapping(method = RequestMethod.GET, path = "/api/restaurant/{restaurant_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantDetailsResponse> getRestaurantById(
             @PathVariable("restaurant_id") final String restaurantId)
@@ -221,7 +227,7 @@ Double temp = BigDecimal.valueOf(restaurantEntity.getCustomerRating()).setScale(
     }
 
 
-
+    //Updating restaurant rating by restaurant UUID
     @CrossOrigin
     @RequestMapping(method = RequestMethod.PUT, path = "/api/restaurant/{restaurant_id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantDetails(

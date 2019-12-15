@@ -29,6 +29,7 @@ public class AddressService {
     @Autowired
     private StateDao stateDao;
 
+    //Creating and persisting a new address added by customer
     @Transactional(propagation = Propagation.REQUIRED)
     public AddressEntity saveAddress(final AddressEntity addressEntity,final CustomerEntity customerEntity)throws SaveAddressException{
         //pincode must have digits only from 0 to 9 and must be of 6 digits
@@ -66,6 +67,7 @@ public class AddressService {
     }
 
 
+    //Validating pincode format - length is 6 and contains only numbers
     public String validatePincode(final String pinCode) throws SaveAddressException{
         boolean validPincode = true;
         if(pinCode.length()==6){
@@ -82,16 +84,19 @@ public class AddressService {
         }
     }
 
+    //Persisting created address entity
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerAddressEntity createCustomerAddress(final CustomerAddressEntity customerAddressEntity){
         return addressDao.createCustomerAddress(customerAddressEntity);
     }
 
+    //Get all addresses for a customer entity
     @Transactional(propagation = Propagation.REQUIRED)
     public List<AddressEntity> getAllAddress (final CustomerEntity customerEntity){
         return customerAddressDao.getCustomerAddressListByCustomer(customerEntity);
     }
 
+    //Getting an address by UUID
     @Transactional(propagation = Propagation.REQUIRED)
     public AddressEntity getAddressByUUID(final String addressUuid,final CustomerEntity customerEntity) throws AddressNotFoundException, AuthorizationFailedException {
         //if address id is empty, throw exception
@@ -115,6 +120,7 @@ public class AddressService {
         }
     }
 
+    //Get Customer-Address entity
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerAddressEntity getCustomerAddressByAddressId(final AddressEntity addressEntity){
         return customerAddressDao.getCustomerAddressByAddressId(addressEntity);
@@ -125,7 +131,7 @@ public class AddressService {
                 return addressDao.deleteAddress(addressEntity);
             }
 
-
+    //List all states available DB table
     @Transactional(propagation = Propagation.REQUIRED)
     public List<StateEntity> getAllStates(){
         return stateDao.getAllStates();

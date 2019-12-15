@@ -23,7 +23,8 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-
+    //Lists call categories in the DB table
+    //No API input
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/category", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CategoriesListResponse> getAllCategories() {
@@ -43,7 +44,8 @@ public class CategoryController {
         return new ResponseEntity<CategoriesListResponse>(categoriesListResponse, HttpStatus.OK);
     }
 
-
+    //Lists all items that belong to a particular category
+    //Get items by category UUID
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/category/{category_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CategoryDetailsResponse> getCategoryById(

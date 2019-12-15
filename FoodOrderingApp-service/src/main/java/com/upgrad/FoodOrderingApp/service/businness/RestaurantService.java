@@ -29,11 +29,13 @@ public class RestaurantService {
     private CategoryDao categoryDao;
 
 
+    //List all restaurants sorted by rating - Descending order
     public List<RestaurantEntity> restaurantsByRating() {
         return restaurantDao.restaurantsByRating();
     }
 
 
+    //List restaurant details by restaurant name
     public List<RestaurantEntity> restaurantsByName(final String restaurantName) throws RestaurantNotFoundException {
         if(restaurantName.isEmpty()){
             throw new RestaurantNotFoundException("RNF-003", "Restaurant name field should not be empty");
@@ -50,6 +52,7 @@ public class RestaurantService {
         return matchingRestaurantEntityList;
     }
 
+    //List restaurants belonging to certain category
     public List<RestaurantEntity> restaurantByCategory(final String categoryId) throws CategoryNotFoundException {
 
         if (categoryId.equals("")) {
@@ -67,7 +70,7 @@ public class RestaurantService {
         return restaurantEntityList;
     }
 
-
+    //Display restaurant details by restaurant UUID
     public RestaurantEntity restaurantByUUID(String uuid) throws RestaurantNotFoundException {
         if (uuid.equals("")) {
             throw new RestaurantNotFoundException("RNF-002", "Restaurant id field should not be empty");
@@ -82,19 +85,22 @@ public class RestaurantService {
     }
 
 
+    //Updating restaurant rating
     @Transactional(propagation = Propagation.REQUIRED)
     public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurantEntity, Double newRating) throws InvalidRatingException {
 
+        //Allowing ratings value only if it is or between 1.0 and 5.0
         if (newRating < 1.0 || newRating > 5.0) {
             throw new InvalidRatingException("IRE-001", "Restaurant should be in the range of 1 to 5");
         }
 
+        //Re-calculating average rating including the new rating
+        //Also updating number of customers ratings
         Double newAverageRating = (
       ((restaurantEntity.getNumberCustomersRated()*restaurantEntity.getCustomerRating())+newRating)/
               (restaurantEntity.getNumberCustomersRated()+1));
-
         restaurantEntity.setNumberCustomersRated(restaurantEntity.getNumberCustomersRated() + 1);
-       System.out.println(newAverageRating);
+
         restaurantEntity.setCustomerRating(newAverageRating);
         return restaurantDao.updateRestaurantEntity(restaurantEntity);
     }

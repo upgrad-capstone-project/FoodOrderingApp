@@ -15,11 +15,13 @@ public class OrderItemDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    //Creating an Order-Item entry
     public OrderItemEntity createOrderItemEntity(OrderItemEntity orderItemEntity) {
         entityManager.persist(orderItemEntity);
         return orderItemEntity;
     }
 
+    //Get item for a particular order
     public List<OrderItemEntity> getItemsByOrder(OrderEntity orderEntity) {
         try {
             return entityManager.createNamedQuery("itemsByOrder", OrderItemEntity.class).setParameter("orderEntity", orderEntity).getResultList();

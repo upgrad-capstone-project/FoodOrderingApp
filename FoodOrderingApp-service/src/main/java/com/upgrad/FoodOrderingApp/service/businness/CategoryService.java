@@ -22,6 +22,7 @@ public class CategoryService {
     private RestaurantDao restaurantDao;
 
 
+    //List all categories - sorted alphabetically by categor name
     public List<CategoryEntity> getAllCategoriesOrderedByName() {
         return categoryDao.getAllCategories().stream()
                 .sorted(Comparator.comparing(CategoryEntity::getCategoryName))
@@ -29,6 +30,7 @@ public class CategoryService {
     }
 
 
+    //Get a category entity by category UUID
     public CategoryEntity getCategoryById(String categoryUuid) throws CategoryNotFoundException {
         if (categoryUuid.equals("")) {
             throw new CategoryNotFoundException("CNF-001", "Category id field should not be empty");
@@ -44,6 +46,7 @@ public class CategoryService {
     }
 
 
+    //List all categories mapped to a restaurant - list by restaurant UUID
     public List<CategoryEntity> getCategoriesByRestaurant(String restaurantUUID) {
         RestaurantEntity restaurantEntity = restaurantDao.getRestaurantByUUID(restaurantUUID);
         return restaurantEntity.getCategories().stream()

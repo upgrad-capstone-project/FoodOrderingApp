@@ -22,6 +22,8 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
+    //Lists all available payment methods
+    //No API input
     @RequestMapping(value = "/payment", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<PaymentListResponse> getPaymentResponse() {
         List<PaymentEntity> paymentEntityList = paymentService.getAllPaymentMethods();
