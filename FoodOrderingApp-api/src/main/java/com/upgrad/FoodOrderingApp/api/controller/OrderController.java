@@ -167,14 +167,21 @@ public class OrderController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, CouponNotFoundException,
             AddressNotFoundException, PaymentMethodNotFoundException,
-            RestaurantNotFoundException, ItemNotFoundException
-    {
+            RestaurantNotFoundException, ItemNotFoundException, SaveOrderException {
         String[] bearerToken = authorization.split("Bearer ");
         CustomerEntity customerEntity = null;
         if(bearerToken.length==1){
             throw new AuthorizationFailedException("ATHR-005","Use valid authorization format <Bearer accessToken>");
         } else {
             customerEntity = customerService.getCustomer(bearerToken[1]);
+        }
+
+        //Ensuring no fields are empty except coupon_id and discount
+        if(saveOrderRequest.getAddressId()==null||saveOrderRequest.getItemQuantities().get(0).getItemId()==null||
+                saveOrderRequest.getItemQuantities().get(0).getPrice()==null||
+                saveOrderRequest.getItemQuantities().get(0).getQuantity()==null||
+        saveOrderRequest.getRestaurantId()==null||saveOrderRequest.getPaymentId()==null||saveOrderRequest.getBill()==null){
+            throw new SaveOrderException("SOR-001","No field should be empty except Coupon_Id and discount");
         }
 
         final OrderEntity orderEntity = new OrderEntity();
