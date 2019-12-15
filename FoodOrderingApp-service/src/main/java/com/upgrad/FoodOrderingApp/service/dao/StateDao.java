@@ -14,6 +14,7 @@ public class StateDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    //Get state entity by state UUID
     public StateEntity getStateByUuid(String StateUuid){
         try{
             return (StateEntity)this.entityManager.createNamedQuery("stateByStateUuid",StateEntity.class).setParameter("uuid", StateUuid).getSingleResult();
@@ -22,6 +23,7 @@ public class StateDao {
         }
     }
 
+    //List all states available in DB table
     public List<StateEntity> getAllStates(){
         try{
             return this.entityManager.createNamedQuery("allTheStates", StateEntity.class).getResultList();

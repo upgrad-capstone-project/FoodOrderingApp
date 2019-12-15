@@ -29,11 +29,13 @@ public class RestaurantService {
     private CategoryDao categoryDao;
 
 
+    //List all restaurants sorted by rating - Descending order
     public List<RestaurantEntity> restaurantsByRating() {
         return restaurantDao.restaurantsByRating();
     }
 
 
+    //List restaurant details by restaurant name
     public List<RestaurantEntity> restaurantsByName(final String restaurantName) throws RestaurantNotFoundException {
         if(restaurantName.isEmpty()){
             throw new RestaurantNotFoundException("RNF-003", "Restaurant name field should not be empty");
@@ -50,6 +52,7 @@ public class RestaurantService {
         return matchingRestaurantEntityList;
     }
 
+    //List restaurants belonging to certain category
     public List<RestaurantEntity> restaurantByCategory(final String categoryId) throws CategoryNotFoundException {
 
         if (categoryId.equals("")) {
@@ -67,7 +70,7 @@ public class RestaurantService {
         return restaurantEntityList;
     }
 
-
+    //Display restaurant details by restaurant UUID
     public RestaurantEntity restaurantByUUID(String uuid) throws RestaurantNotFoundException {
         if (uuid.equals("")) {
             throw new RestaurantNotFoundException("RNF-002", "Restaurant id field should not be empty");
@@ -82,6 +85,7 @@ public class RestaurantService {
     }
 
 
+    //Updating restaurant rating
     @Transactional(propagation = Propagation.REQUIRED)
     public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurantEntity, Double newRating) throws InvalidRatingException {
 

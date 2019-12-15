@@ -13,6 +13,8 @@ public class OrderDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    //Get coupon by coupon name
+    //Returns List<CouponEntity>
     public List<CouponEntity> getCouponByName(String coupon_name) {
         try {
             return (List<CouponEntity>) entityManager.createNamedQuery("getCouponByName", CustomerEntity.class).setParameter("coupon_name", coupon_name).getSingleResult();
@@ -20,6 +22,9 @@ public class OrderDao {
             return null;
         }
     }
+
+    //Get coupon by coupon name
+    //Returns Single result
     public CouponEntity getCouponByCouponName(String couponName) {
         try {
             return entityManager.createNamedQuery("couponByCouponName", CouponEntity.class).setParameter("couponName", couponName).getSingleResult();
@@ -27,6 +32,8 @@ public class OrderDao {
             return null;
         }
     }
+
+    //Get coupon by coupon UUID
     public CouponEntity getCouponByCouponUUID(String uuid) {
         try {
             return entityManager.createNamedQuery("couponByUUID", CouponEntity.class).setParameter("uuid", uuid).getSingleResult();
@@ -34,6 +41,8 @@ public class OrderDao {
             return null;
         }
     }
+
+    //Get orders by address entity
     public List<OrderEntity> getOrdersByAddress(AddressEntity addressEntity) {
         try {
             return entityManager.createNamedQuery("ordersByAddress", OrderEntity.class).setParameter("address", addressEntity).getResultList();
@@ -41,10 +50,14 @@ public class OrderDao {
             return null;
         }
     }
+
+    //Creating/Saving new order
     public OrderEntity createOrder(OrderEntity orderEntity) {
         entityManager.persist(orderEntity);
         return orderEntity;
     }
+
+    //List all past orders of customer
     public List<OrderEntity> getOrdersByCustomers(CustomerEntity customerEntity) {
         try {
             return entityManager.createNamedQuery("ordersByCustomer", OrderEntity.class).setParameter("customer", customerEntity).getResultList();
@@ -52,6 +65,8 @@ public class OrderDao {
             return null;
         }
     }
+
+    //List all orders by restaurant
     public List<OrderEntity> getOrdersByRestaurant(RestaurantEntity restaurantEntity) {
         try {
             return entityManager.createNamedQuery("ordersByRestaurant", OrderEntity.class).setParameter("restaurant", restaurantEntity).getResultList();
