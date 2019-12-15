@@ -27,7 +27,8 @@ public class OrderService {
     @Autowired
     private CustomerDao customerDao;
 
-
+    //Unused method, written intially
+    //Not used
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerAuthEntity getCoupon(final String authorization, final String coupon_name)
             throws AuthorizationFailedException, CouponNotFoundException {
@@ -46,6 +47,7 @@ public class OrderService {
         return customerAuthEntity;
     }
 
+    //Get coupon details by coupon name
     public CouponEntity getCouponByCouponName(String couponName) throws CouponNotFoundException {
 
         if (couponName.equals("")) {
@@ -67,19 +69,21 @@ public class OrderService {
         return couponEntity;
     }
 
+    //Creating/Saving new order by customer
     @Transactional(propagation = Propagation.REQUIRED)
     public OrderEntity saveOrder(OrderEntity orderEntity) {
         return orderDao.createOrder(orderEntity);
     }
 
 
+    //Save items included in an order
     @Transactional(propagation = Propagation.REQUIRED)
     public OrderItemEntity saveOrderItem(OrderItemEntity orderItemEntity) {
         return orderItemDao.createOrderItemEntity(orderItemEntity);
     }
 
 
-    //getordersby customer
+    //List all orders made by a customer
     public List<OrderEntity> getOrdersByCustomers(CustomerEntity customerEntity) {
          List<OrderEntity> orderEntityList = new ArrayList<>();
         for (OrderEntity orderEntity : orderDao.getOrdersByCustomers(customerEntity)) {

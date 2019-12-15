@@ -15,7 +15,7 @@ public class RestaurantDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-
+    //Return restaurant list sorted based on customer rating
     public List<RestaurantEntity> restaurantsByRating() {
         try {
             return entityManager.createNamedQuery("allRestaurantsByRating", RestaurantEntity.class).getResultList();
@@ -25,6 +25,7 @@ public class RestaurantDao {
     }
 
 
+    //Return restaurant details by restaurant UUID
     public RestaurantEntity getRestaurantByUUID(String uuid) {
         try {
             return entityManager.createNamedQuery("restaurantByUUID", RestaurantEntity.class).setParameter("uuid", uuid).getSingleResult();
@@ -34,6 +35,7 @@ public class RestaurantDao {
     }
 
 
+    //Update modifying restaurant details in DB
     public RestaurantEntity updateRestaurantEntity(RestaurantEntity restaurantEntity) {
         return entityManager.merge(restaurantEntity);
     }

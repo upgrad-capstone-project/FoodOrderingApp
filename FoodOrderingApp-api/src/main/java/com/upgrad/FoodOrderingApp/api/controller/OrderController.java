@@ -38,6 +38,7 @@ public class OrderController {
     @Autowired
     private ItemService itemService;
 
+    //Get details of the coupon by coupon name
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/order/coupon/{coupon_name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CouponDetailsResponse> getCouponByCouponName(
@@ -62,6 +63,8 @@ public class OrderController {
         return new ResponseEntity<CouponDetailsResponse>(couponDetailsResponse, HttpStatus.OK);
     }
 
+    //Lists all past orders by customer
+    //List all past orders by customer valid access token
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/order", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CustomerOrderResponse> getCustomerOrders(
@@ -149,6 +152,7 @@ public class OrderController {
         return new ResponseEntity<CustomerOrderResponse>(customerOrderResponse, HttpStatus.OK);
     }
 
+    //Creating/Saving new order by customer
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, path = "/order", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveOrderResponse> saveOrder(

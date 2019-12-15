@@ -35,6 +35,8 @@ public class AddressDao {
         }
     }
 
+    //Update address deletion in DB
+    //Sets active status to 0, no actual removal from DB
     public AddressEntity deleteAddress(AddressEntity addressEntity){
         String uuid = addressEntity.getUuid();
         addressEntity.setActive(0);
