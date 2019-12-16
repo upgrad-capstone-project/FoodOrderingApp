@@ -65,12 +65,12 @@ public class RestaurantController {
                     .stream()
                     .map(o -> String.valueOf(o.getCategoryName()))
                     .collect(Collectors.joining(", "));
-
+            Double temp3 = BigDecimal.valueOf(restaurantEntity.getCustomerRating()).setScale(1, RoundingMode.HALF_UP).doubleValue();
             RestaurantList restaurantList = new RestaurantList()
                     .id(UUID.fromString(restaurantEntity.getUuid()))
                     .restaurantName(restaurantEntity.getRestaurantName())
                     .photoURL(restaurantEntity.getPhotoUrl())
-                    .customerRating(new BigDecimal(restaurantEntity.getCustomerRating()))
+                    .customerRating(new BigDecimal(temp3))
                     .averagePrice(restaurantEntity.getAvgPrice())
                     .numberCustomersRated(restaurantEntity.getNumberCustomersRated())
                     .address(restaurantDetailsResponseAddress)
@@ -114,12 +114,12 @@ public class RestaurantController {
                     .stream()
                     .map(o -> String.valueOf(o.getCategoryName()))
                     .collect(Collectors.joining(", "));
-
+            Double temp2 = BigDecimal.valueOf(restaurantEntity.getCustomerRating()).setScale(1, RoundingMode.HALF_UP).doubleValue();
             RestaurantList restaurantList = new RestaurantList()
                     .id(UUID.fromString(restaurantEntity.getUuid()))
                     .restaurantName(restaurantEntity.getRestaurantName())
                     .photoURL(restaurantEntity.getPhotoUrl())
-                    .customerRating(new BigDecimal(restaurantEntity.getCustomerRating()))
+                    .customerRating(new BigDecimal(temp2))
                     .averagePrice(restaurantEntity.getAvgPrice())
                     .numberCustomersRated(restaurantEntity.getNumberCustomersRated())
                     .address(restaurantDetailsResponseAddress)
@@ -158,12 +158,12 @@ public class RestaurantController {
                     .stream()
                     .map(o -> String.valueOf(o.getCategoryName()))
                     .collect(Collectors.joining(", "));
-
+            Double temp1 = BigDecimal.valueOf(restaurantEntity.getCustomerRating()).setScale(1, RoundingMode.HALF_UP).doubleValue();
             RestaurantList restaurantList = new RestaurantList()
                     .id(UUID.fromString(restaurantEntity.getUuid()))
                     .restaurantName(restaurantEntity.getRestaurantName())
                     .photoURL(restaurantEntity.getPhotoUrl())
-                    .customerRating(new BigDecimal(restaurantEntity.getCustomerRating()))
+                    .customerRating(new BigDecimal(temp1))
                     .averagePrice(restaurantEntity.getAvgPrice())
                     .numberCustomersRated(restaurantEntity.getNumberCustomersRated())
                     .address(restaurantDetailsResponseAddress)
@@ -195,7 +195,7 @@ public class RestaurantController {
                 .city(restaurantEntity.getAddress().getCity())
                 .pincode(restaurantEntity.getAddress().getPinCode())
                 .state(restaurantDetailsResponseAddressState);
-Double temp = BigDecimal.valueOf(restaurantEntity.getCustomerRating()).setScale(2, RoundingMode.HALF_UP).doubleValue();
+Double temp = BigDecimal.valueOf(restaurantEntity.getCustomerRating()).setScale(1, RoundingMode.HALF_UP).doubleValue();
         RestaurantDetailsResponse restaurantDetailsResponse = new RestaurantDetailsResponse()
                 .id(UUID.fromString(restaurantEntity.getUuid()))
                 .restaurantName(restaurantEntity.getRestaurantName())
