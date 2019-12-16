@@ -53,7 +53,7 @@ public class CategoryController {
             throws CategoryNotFoundException
     {
 
-        CategoryEntity categoryEntity = categoryService.getCategoryById(categoryId);
+        CategoryEntity categoryEntity = categoryService.getCategoryById(categoryId.toLowerCase());
 
 
         CategoryDetailsResponse categoryDetailsResponse = new CategoryDetailsResponse().id(UUID.fromString(categoryEntity.getUuid())).categoryName(categoryEntity.getCategoryName());

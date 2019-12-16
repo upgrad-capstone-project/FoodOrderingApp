@@ -116,7 +116,7 @@ public class CustomerController {
         if(bearerToken.length==1){
             throw new AuthorizationFailedException("ATHR-005","Use valid authorization format <Bearer accessToken>");
         } else {
-            final CustomerAuthEntity customerAuthLogout = customerService.logout(bearerToken[1]);
+            final CustomerEntity customerAuthLogout = customerService.logout(bearerToken[1]);
             LogoutResponse logoutResponse = new LogoutResponse()
                     .id(customerAuthLogout.getUuid())
                     .message("LOGGED OUT SUCCESSFULLY");

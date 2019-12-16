@@ -122,7 +122,7 @@ public class CustomerService {
 
     //Logout endpoint function
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerAuthEntity logout(final String accessToken) throws AuthorizationFailedException{
+    public CustomerEntity logout(final String accessToken) throws AuthorizationFailedException{
         CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthToken(accessToken);
         //if access token doesnt exist in database
         if(customerAuthEntity == null){
@@ -137,7 +137,7 @@ public class CustomerService {
         else{
             final ZonedDateTime now = ZonedDateTime.now();
             customerAuthEntity.setLogoutAt(now);
-            return customerAuthEntity;
+            return customerAuthEntity.getCustomer();
         }
     }
 
