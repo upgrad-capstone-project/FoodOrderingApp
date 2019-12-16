@@ -88,6 +88,8 @@ public class OrderController {
 
         for (OrderEntity orderEntity : orderEntityList) {
             OrderListCoupon orderListCoupon = null;
+            //Handling null value for coupon_id
+            //Included this logic considering that not all orders will have a coupon_id
             if(orderEntity.getCoupon()==null) {
                 orderListCoupon = new OrderListCoupon()
                         .id(null)
@@ -177,6 +179,9 @@ public class OrderController {
         }
 
         //Ensuring no fields are empty except coupon_id and discount
+        /*Included this logic considering that not all orders will have a coupon_id and discount
+         but other values are required
+        */
         if(saveOrderRequest.getAddressId()==null||saveOrderRequest.getItemQuantities().get(0).getItemId()==null||
                 saveOrderRequest.getItemQuantities().get(0).getPrice()==null||
                 saveOrderRequest.getItemQuantities().get(0).getQuantity()==null||
@@ -189,15 +194,16 @@ public class OrderController {
         if(saveOrderRequest.getCouponId()!=null) {
             orderEntity.setCoupon(orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString()));
         }
-       // orderEntity.setPayment(paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()));
-       // orderEntity.setCustomer(customerEntity);
-       // orderEntity.setAddress(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId(), customerEntity));
-        orderEntity.setBill(saveOrderRequest.getBill().doubleValue());
+
+        // Allowing null value for discount
+        // Defaulting to 0.00 if no value entered
+        // Included this logic considering that not all orders will have a discount
         if(saveOrderRequest.getDiscount()!=null) {
             orderEntity.setDiscount(saveOrderRequest.getDiscount().doubleValue());
         } else {
             orderEntity.setDiscount(0.00);
         }
+
         orderEntity.setCustomer(customerEntity);
         CustomerEntity loggedInCustomer = customerEntity;
         //System.out.println(addressService.getAddressByAddressUuid(saveOrderRequest.getAddressId()).getUuid());
@@ -210,6 +216,7 @@ public class OrderController {
         orderEntity.setPayment(paymentService.getPaymentMethod(saveOrderRequest.getPaymentId().toString()));
         orderEntity.setRestaurant(restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()));
         orderEntity.setDate(new Date());
+        orderEntity.setBill(saveOrderRequest.getBill().doubleValue());
         OrderEntity savedOrderEntity = orderService.saveOrder(orderEntity);
 
         for (ItemQuantity itemQuantity : saveOrderRequest.getItemQuantities()) {
